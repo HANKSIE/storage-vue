@@ -11,7 +11,7 @@ const originState: State = {
 
 const state = reactive(originState);
 
-const setUser = (user: User) => state.user = user;
+const setUser = (user: User|undefined) => state.user = user;
 
 export default { 
     state: readonly(state),

@@ -6,6 +6,10 @@
 
         <q-input filled v-model="password" label="Password" type="password" />
         <div>
+          還沒註冊嗎?
+          <router-link :to="{ name: 'register' }"> 點我註冊 </router-link>
+        </div>
+        <div>
           <q-btn label="登入" type="submit" color="primary" />
         </div>
       </q-form>

@@ -1,4 +1,5 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import logout from "@/action/logout";
 
 const http: AxiosInstance = axios.create();
 
@@ -25,7 +26,7 @@ http.interceptors.response.use(
   },
   (err: AxiosError) :Promise<never> => {
     if (err.response?.status == 401) {
-      //logout handle
+      logout();
     }
     if(err.response?.status == 403){
       //forbidden handle

@@ -11,7 +11,7 @@
         />
         <q-toolbar-title> Storage Space </q-toolbar-title>
         <q-spacer></q-spacer>
-        <q-btn dense>logout</q-btn>
+        <q-btn @click="logout">logout</q-btn>
       </q-toolbar>
     </q-header>
 
@@ -26,13 +26,15 @@
 
 <script lang="ts">
 import { ref, defineComponent } from "vue";
+import logout from "@/action/logout";
 
 export default defineComponent({
   setup() {
-    const drawerToggle = ref(true);
+    const drawerToggle = ref<boolean>(true);
 
     return {
       drawerToggle,
+      logout,
     };
   },
 });

@@ -10,7 +10,7 @@
           @click="drawerToggle = !drawerToggle"
         />
         <q-toolbar-title> Storage Space </q-toolbar-title>
-        <q-spacer></q-spacer>
+        <q-space />
         <q-btn @click="logout">logout</q-btn>
       </q-toolbar>
     </q-header>

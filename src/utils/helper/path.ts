@@ -6,7 +6,7 @@ export default class PathHelper {
 
     }
 
-    static splitPathWithoutEmpty(path:string): Array<string>{
+    static splitPathWithoutEmpty(path: string): string[]{
         path = PathHelper.pathformat(path);
         return path.split("/").filter((el) => !!el);
     }

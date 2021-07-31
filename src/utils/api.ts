@@ -1,8 +1,9 @@
 import http from "./http";
 import fileConfig from "@/config/file";
-import { LoginResponse } from "@/type/response"
+import { LoginResponse } from "@/type/response/auth"
 import { AxiosResponse } from "axios";
 import User from "@/type/user";
+import { ListResponse, MakeDirResponse } from "@/type/response/fileManager";
 
 const api = {
 
@@ -20,25 +21,25 @@ const api = {
       return http.get('logout');
     },
 
-    register(formData: FormData) {
+    register(formData: FormData): Promise<AxiosResponse<void>> {
       return http.post('register', formData);
     }
   },
 
   fileManager: {
-    ls(type: number, id: number, dir: string, only = fileConfig.ls.BOTH) {
+    ls(type: number, id: number, dir: string, only = fileConfig.ls.BOTH): Promise<AxiosResponse<ListResponse>> {
       return http.post(`${type}/${id}/files`,{
         dir,
         only,
       });
     },
-    mkdir(type: number, id: number, dir: string, dirname: string){
+    mkdir(type: number, id: number, dir: string, dirname: string): Promise<AxiosResponse<MakeDirResponse>>{
       return http.post(`${type}/${id}/files/mkdir`, {
         dir,
         dirname
       });
     },
-    remove(type: number, id: number, dir: string, files: Array<string>) {
+    remove(type: number, id: number, dir: string, files: string[]) {
       return http.delete(`${type}/${id}/files/remove`, {
         data: {
           dir,
@@ -46,7 +47,7 @@ const api = {
         }
       });
     },
-    move(type: number, id: number, from_dir: string, to_dir: string, files: Array<string>, override_flag = fileConfig.cp_mv.OVERRIDE_NONE){
+    move(type: number, id: number, from_dir: string, to_dir: string, files: string[], override_flag = fileConfig.cp_mv.OVERRIDE_NONE){
       return http.put(`${type}/${id}/files/move`, {
         from_dir,
         to_dir,
@@ -54,7 +55,7 @@ const api = {
         override_flag
       });
     },
-    copy(type: number, id: number, from_dir: string, to_dir: string, files: Array<string>, override_flag = fileConfig.cp_mv.OVERRIDE_NONE){
+    copy(type: number, id: number, from_dir: string, to_dir: string, files: string[], override_flag = fileConfig.cp_mv.OVERRIDE_NONE){
       return http.post(`${type}/${id}/files/copy`, {
         from_dir,
         to_dir,
@@ -69,7 +70,7 @@ const api = {
         new_file
       });
     },
-    download(type: number, id: number, dir: string, files: Array<string>){
+    download(type: number, id: number, dir: string, files: string[]){
       return http.post(`${type}/${id}/files/download`,
         {
           dir,

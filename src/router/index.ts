@@ -7,7 +7,7 @@ import NormalTemplate from "@/layout/Normal.vue";
 import FileManager from "@/views/Auth/FileManager.vue";
 import Setting from "@/views/Auth/Setting.vue";
 
-const routes: Array<RouteRecordRaw> = [
+const routes: RouteRecordRaw[] = [
   {
     path: "/dashboard",
     component: DashboardTemplate,

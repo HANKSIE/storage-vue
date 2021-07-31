@@ -1,25 +1,53 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
-import Home from "../views/Home.vue";
+import Login from "@/views/Login.vue";
+import Register from "@/views/Register.vue";
+import PageNotFound from "@/views/PageNotFound.vue";
+import DashboardTemplate from "@/layout/Dashboard.vue";
+import NormalTemplate from "@/layout/Normal.vue";
+import FileManager from "@/views/Auth/FileManager.vue";
+import Setting from "@/views/Auth/Setting.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: "/",
-    name: "Home",
-    component: Home,
+    path: "/dashboard",
+    component: DashboardTemplate,
+    children: [
+      {
+        path: "file",
+        name: "user_file",
+        component: FileManager
+      },
+      {
+        path: "setting",
+        name: "user_setting",
+        component: Setting
+      },
+    ]
   },
   {
-    path: "/about",
-    name: "About",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/About.vue"),
+    path: "/",
+    component: NormalTemplate,
+    children: [
+      {
+        path: "login",
+        name: "login",
+        component: Login,
+      },
+      {
+        path: "register",
+        name: "register",
+        component: Register,
+      },
+    ]
+  },
+  {
+    path: "/:catchAll(.*)",
+    component: PageNotFound,
   },
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(),
   routes,
 });
 

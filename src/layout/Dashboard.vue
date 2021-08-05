@@ -30,7 +30,7 @@ import logout from "@/action/logout";
 
 export default defineComponent({
   setup() {
-    const drawerToggle = ref<boolean>(true);
+    const drawerToggle = ref<boolean>(false);
 
     return {
       drawerToggle,

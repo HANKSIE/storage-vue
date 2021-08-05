@@ -1,7 +1,8 @@
 export interface FileInfo {
     name: string,
-    mimeType: string,
-    last_modified: string,
+    dir: string,
+    mime: string,
+    lastModified: string,
     size: string
 }
 

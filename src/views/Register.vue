@@ -34,7 +34,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import api from "@/utils/api";
+import authApi from "@/utils/api/auth";
 import { useRouter } from "vue-router";
 
 export default defineComponent({
@@ -48,7 +48,7 @@ export default defineComponent({
 
     const register = (e: Event) => {
       const formData = new FormData(e.target as HTMLFormElement);
-      api.auth
+      authApi
         .register(formData)
         .then(() => {
           router.push({ name: "login" });

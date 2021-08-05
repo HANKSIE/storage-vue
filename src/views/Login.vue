@@ -18,7 +18,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import api from "@/utils/api";
+import authApi from "@/utils/api/auth";
 import { useRouter } from "vue-router";
 import { useStore } from "@/store";
 
@@ -32,7 +32,7 @@ export default defineComponent({
 
     const login = async () => {
       try {
-        const res = await api.auth.login(email.value, password.value);
+        const res = await authApi.login(email.value, password.value);
         const { token, user } = res.data;
 
         localStorage.setItem("token", token);

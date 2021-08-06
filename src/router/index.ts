@@ -4,8 +4,8 @@ import Register from "@/views/Register.vue";
 import PageNotFound from "@/views/PageNotFound.vue";
 import DashboardTemplate from "@/layout/Dashboard.vue";
 import NormalTemplate from "@/layout/Normal.vue";
-import FileManager from "@/views/Auth/FileManager.vue";
-import Setting from "@/views/Auth/Setting.vue";
+import FileManager from "@/views/Dashboard/FileManager.vue";
+import Setting from "@/views/Dashboard/Setting.vue";
 
 const routes: RouteRecordRaw[] = [
   {

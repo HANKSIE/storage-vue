@@ -15,14 +15,7 @@ export interface RemoveResponse {
     notExists: string[]
 }
 
-export interface MoveResponse {
-    fileInfos: FileInfo[], 
-    exists: string[],
-    notExists: string[],
-    selfs: string[]
-}
-
-export interface CopyResponse {
+export interface CopyMoveResponse {
     fileInfos: FileInfo[], 
     exists: string[],
     notExists: string[],

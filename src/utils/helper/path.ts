@@ -1,14 +1,9 @@
 export default class PathHelper {
-    static pathformat(path: string): string{
+    static format(path: string): string{
         path = path.replace(/\\+/g, "/");
         path = path.replace(/\/+/g, "/");
         return path;
 
-    }
-
-    static splitPathWithoutEmpty(path: string): string[]{
-        path = PathHelper.pathformat(path);
-        return path.split("/").filter((el) => !!el);
     }
 
     static extension(name: string) {
@@ -16,12 +11,12 @@ export default class PathHelper {
     }
   
     static basename(path: string){
-        path = PathHelper.pathformat(path);
+        path = PathHelper.format(path);
         return path.split("/").reverse()[0];
     }
 
-    static root(path:string) {
-        path = PathHelper.pathformat(path);
+    static rootFileName(path: string) {
+        path = PathHelper.format(path);
         if(!path.includes("/")){
             return "";
         }

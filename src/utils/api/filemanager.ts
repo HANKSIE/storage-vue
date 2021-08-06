@@ -1,7 +1,7 @@
 import http from "@/utils/http";
 import fileManagerConfig from "@/config/filemanager";
 import { AxiosResponse } from "axios";
-import { ListResponse, MakeDirResponse } from "@/type/response/fileManager";
+import { CopyMoveResponse, ListResponse, MakeDirResponse, RenameResponse, UploadResponse } from "@/type/response/fileManager";
 
 const api = {
     list(type: number, id: number, dir: string, options = fileManagerConfig.LIST_ALL): Promise<AxiosResponse<ListResponse>> {
@@ -24,7 +24,7 @@ const api = {
           }
         });
       },
-      move(type: number, id: number, fromDir: string, toDir: string, filenames: string[], options = fileManagerConfig.OVERRIDE_NONE){
+      move(type: number, id: number, fromDir: string, toDir: string, filenames: string[], options = fileManagerConfig.OVERRIDE_NONE): Promise<AxiosResponse<CopyMoveResponse>>{
         return http.put(`${type}/${id}/files/move`, {
           fromDir,
           toDir,
@@ -32,7 +32,7 @@ const api = {
           options
         });
       },
-      copy(type: number, id: number, fromDir: string, toDir: string, filenames: string[], options = fileManagerConfig.OVERRIDE_NONE){
+      copy(type: number, id: number, fromDir: string, toDir: string, filenames: string[], options = fileManagerConfig.OVERRIDE_NONE): Promise<AxiosResponse<CopyMoveResponse>>{
         return http.post(`${type}/${id}/files/copy`, {
           fromDir,
           toDir,
@@ -40,7 +40,7 @@ const api = {
           options
         });
       },
-      rename(type: number, id: number, dir: string, oldFileName: string, newFileName: string){
+      rename(type: number, id: number, dir: string, oldFileName: string, newFileName: string): Promise<AxiosResponse<RenameResponse>>{
         return http.put(`${type}/${id}/files/rename`, {
           dir,
           oldFileName,
@@ -58,7 +58,7 @@ const api = {
           }
         );
       },
-      upload(type: number, id: number, dir: string, filePaths: string[], files: File[], options: number){
+      upload(type: number, id: number, dir: string, filePaths: string[], files: File[], options: number): Promise<AxiosResponse<UploadResponse>>{
         const data = new FormData();
         for(let i=0; i<filePaths.length; i++){
           data.append(filePaths[i], files[i]);

@@ -3,6 +3,8 @@ import ListResponse from "@/components/FileManager/type/response/ListResponse";
 import MakeDirResponse from "@/components/FileManager/type/response/MakeDirResponse";
 import RenameResponse from "@/components/FileManager/type/response/RenameResponse";
 import UploadResponse from "@/components/FileManager/type/response/UploadResponse";
+import DownloadResponse from "@/components/FileManager/type/response/DownloadResponse";
+import RemoveResponse from "@/components/FileManager/type/response/RemoveResponse";
 
 import CopyMoveRequest from "@/components/FileManager/type/request/CopyMoveRequest";
 import ListRequest from "@/components/FileManager/type/request/ListRequest";
@@ -10,11 +12,15 @@ import MakeDirRequest from "@/components/FileManager/type/request/MakeDirRequest
 import RenameRequest from "@/components/FileManager/type/request/RenameRequest";
 import UploadRequest from "@/components/FileManager/type/request/UploadRequest";
 import DownloadRequest from "@/components/FileManager/type/request/DownloadRequest";
+import RemoveRequest from "@/components/FileManager/type/request/RemoveRequest";
+
 
 import http from "@/utils/http";
 import { AxiosResponse } from "axios";
-import RemoveRequest from "@/components/FileManager/type/request/RemoveRequest";
-const api = {
+import FileManagerApi from "@/components/FileManager/type/api";
+
+
+const api: FileManagerApi = {
     list(data: ListRequest): Promise<AxiosResponse<ListResponse>> {
       const { type, id, dir, options } = data;
       return http.post(`${type}/${id}/files`,{
@@ -29,7 +35,7 @@ const api = {
         filename
       });
     },
-    remove(data: RemoveRequest): Promise<AxiosResponse<void>> {
+    remove(data: RemoveRequest): Promise<AxiosResponse<RemoveResponse>> {
       const { type, id, dir, filenames } = data;
       return http.delete(`${type}/${id}/files/remove`, {
         data: {
@@ -64,7 +70,7 @@ const api = {
         newFileName
       });
     },
-    download(data: DownloadRequest){
+    download(data: DownloadRequest): Promise<AxiosResponse<DownloadResponse>> {
       const { type, id, dir, filenames } = data;
       return http.post(`${type}/${id}/files/download`,
         {

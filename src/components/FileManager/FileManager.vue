@@ -1,64 +1,51 @@
 <template>
-  <div class="q-pa-md">
-    <q-table
-      title="Treats"
-      :rows="fileInfos"
-      :columns="columns"
-      row-key="name"
-      selection="multiple"
-      v-model:selected="selected"
-    >
-      <template v-slot:top>
-        <!-- 工具列 -->
-        <!-- 麵包屑導航 -->
-        <bread-crumbs-navigate :nodes="pwdBreadcrumbNodes" @changeDir="cd" />
-      </template>
-      <template v-slot:body="props">
-        <q-tr :props="props">
-          <q-td>
-            <q-checkbox v-model="props.selected" />
-          </q-td>
-          <q-td key="name" :props="props">
-            <div>
-              <q-img
-                :src="getMimeIcon(props.row.mime)"
-                width="30px"
-                class="q-mr-xs"
-              />
-              <template v-if="props.row.mime == 'directory'">
-                <span @click="cd(pathHelper.concat(pwdStr, props.row.name))">{{
-                  props.row.name
-                }}</span>
-              </template>
-              <template v-else>
-                <span>{{ props.row.name }}</span>
-              </template>
-            </div>
-          </q-td>
-          <q-td key="lastModified" :props="props">
-            {{ props.row.lastModified }}</q-td
-          >
-          <q-td key="size" :props="props"> {{ props.row.size }}</q-td>
-        </q-tr>
-      </template>
-    </q-table>
+  <div class="q-pa-md full-width">
+    <div class="row justify-center">
+      <div class="col-10" style="height: 500px">
+        <q-table
+          title="Treats"
+          :rows="fileInfos"
+          :columns="columns"
+          row-key="name"
+          selection="multiple"
+          v-model:selected="selected"
+          class="full-height scroll"
+        >
+          <template v-slot:top>
+            <!-- 工具列 -->
+            <tool-bar :selected="selected" @remove="rm" />
+            <!-- 麵包屑導航 -->
+            <bread-crumbs-navigate
+              :nodes="pwdBreadcrumbNodes"
+              @changeDir="cd"
+            />
+          </template>
+          <template v-slot:body="props">
+            <row-data @changeDir="cd" :properties="props" :pwdStr="pwdStr" />
+          </template>
+        </q-table>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, onMounted, toRefs } from "@vue/runtime-core";
-import getMimeIcon from "./utils/getMimeIcon";
 import { columns } from "./config/widget";
 import useFileInfos from "./composition/fileInfos";
 import useSelected from "./composition/selected";
-import list from "./methods/list";
 import usePwd from "./composition/pwd";
-import changeDir from "./methods/changeDir";
-import pathHelper from "./utils/path";
+
 import BreadCrumbsNavigate from "./components/BreadCrumbsNavigate.vue";
+import ToolBar from "./components/ToolBar.vue";
+import RowData from "./components/RowData.vue";
+
+import list from "./methods/list";
+import changeDir from "./methods/changeDir";
+import remove from "./methods/remove";
 
 export default defineComponent({
-  components: { BreadCrumbsNavigate },
+  components: { BreadCrumbsNavigate, ToolBar, RowData },
   props: {
     type: {
       type: String,
@@ -83,15 +70,18 @@ export default defineComponent({
       changeDir(pwd, fileInfos, type.value!, id.value!, dir);
     };
 
+    const rm = (): void => {
+      remove(fileInfos, selected, type.value!, id.value!, pwdStr.value);
+    };
+
     return {
       columns,
       fileInfos,
       selected,
       pwdBreadcrumbNodes,
       pwdStr,
-      getMimeIcon,
-      pathHelper,
       cd,
+      rm,
     };
   },
 });

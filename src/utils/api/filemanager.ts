@@ -1,6 +1,10 @@
+import CopyMoveResponse from "@/components/FileManager/response/CopyMoveResponse";
+import ListResponse from "@/components/FileManager/response/ListResponse";
+import MakeDirResponse from "@/components/FileManager/response/MakeDirResponse";
+import RenameResponse from "@/components/FileManager/response/RenameResponse";
+import UploadResponse from "@/components/FileManager/response/UploadResponse";
 import http from "@/utils/http";
 import { AxiosResponse } from "axios";
-import { CopyMoveResponse, ListResponse, MakeDirResponse, RenameResponse, UploadResponse } from "@/type/response/fileManager";
 
 const api = {
     list(type: string, id: number, dir: string, options: number): Promise<AxiosResponse<ListResponse>> {

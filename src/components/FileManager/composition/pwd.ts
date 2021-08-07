@@ -1,4 +1,4 @@
-import PathHelper from "@/utils/helper/path";
+import PathHelper from "@/components/FileManager/utils/path";
 import { ref, Ref, computed } from "vue";
 
 type RefPwd = Ref<string[]>;

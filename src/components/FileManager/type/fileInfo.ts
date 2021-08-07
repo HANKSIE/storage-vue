@@ -1,4 +1,4 @@
-interface FileInfo {
+type FileInfo = {
     name: string,
     dir: string,
     mime: string,

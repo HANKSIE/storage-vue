@@ -3,7 +3,7 @@ type FormatFunction = (val: any, row: object) => any;
 type StyleFunction = (row: object) => string;
 type ClassFunction = (row: object) => string;
 
-interface Column {
+type Column = {
     // unique id
     // identifies column
     // (used by pagination.sortBy, "body-cell-[name]" slot, ...)

@@ -1,7 +1,7 @@
 import { reactive, readonly } from "vue";
 import User from "@/type/user";
 
-interface State {
+type State = {
     user: User|undefined
 }
 

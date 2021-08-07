@@ -1,4 +1,4 @@
-interface FileGroup {
+type FileGroup = {
     [rootItem: string]: {
         files: File[],
         paths: string[]

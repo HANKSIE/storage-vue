@@ -1,6 +1,6 @@
 import FileInfo from "../../../type/fileInfo";
 
-interface CopyMoveRecord {
+type CopyMoveRecord = {
     fromDir: string;
     toDir: string;
     fileInfo: FileInfo;

@@ -1,9 +1,10 @@
 import User from "../user";
-export interface LoginResponse {
+
+export type LoginResponse = {
     token: string,
     user: User
 }
 
-export interface LoadUserResponse {
+export type LoadUserResponse = {
     user: User
 }

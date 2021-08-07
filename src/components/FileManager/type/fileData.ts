@@ -1,4 +1,4 @@
-interface FileData {
+type FileData = {
     files: File[],
     filePaths: string[]
 }

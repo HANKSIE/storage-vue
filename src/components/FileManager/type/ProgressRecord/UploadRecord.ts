@@ -1,4 +1,4 @@
-interface UploadRecord {
+type UploadRecord = {
     dir: string;
     rootFileName: string;
     files: File[];

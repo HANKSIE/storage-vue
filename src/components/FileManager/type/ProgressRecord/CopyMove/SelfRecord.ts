@@ -1,5 +1,5 @@
 import FileInfo from "../../../type/fileInfo";
-interface SelfRecord {
+type SelfRecord = {
     fileInfo: FileInfo;
 }
 

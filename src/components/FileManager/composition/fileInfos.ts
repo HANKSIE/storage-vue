@@ -1,42 +1,21 @@
-import { FileInfo } from "@/type/fileManager"
-import { ref } from "vue"
+import FileInfo from "../type/fileInfo";
+import { ref, Ref } from "vue"
+
+type RefFileInfos = Ref<FileInfo[]>;
 
 const useFileInfos = () => {
-    const fileInfos = ref<FileInfo[]>(
-        [
-            {
-              name: "test1.jpg",
-              dir: "/",
-              mime: "image/jpeg",
-              lastModified: "2021-08-06 11:57:10",
-              size: "10 MB",
-            },
-            {
-              name: "test2.jpg",
-              dir: "/",
-              mime: "image/jpeg",
-              lastModified: "2021-08-06 11:57:10",
-              size: "10 MB",
-            },
-            {
-              name: "test3.jpg",
-              dir: "/",
-              mime: "image/jpeg",
-              lastModified: "2021-08-06 11:57:10",
-              size: "10 MB",
-            },
-        ]
-    );
-    const setFileInfos = (infos: FileInfo[]): void => {
+    const fileInfos: RefFileInfos = ref<FileInfo[]>([]);
+
+    const setFileInfos = (fileInfos: RefFileInfos, infos: FileInfo[]): void => {
         fileInfos.value = infos;
     }
-    const removeFileInfos = (names: string[]): void => {
+    const removeFileInfos = (fileInfos: RefFileInfos, names: string[]): void => {
         fileInfos.value = fileInfos.value.filter((info) => !names.includes(info.name));
     }
-    const addFileInfos = (infos: FileInfo[]): void => {
+    const addFileInfos = (fileInfos: RefFileInfos, infos: FileInfo[]): void => {
         fileInfos.value = fileInfos.value.concat(infos);
     }
-    const replaceFileInfo = (name: string, info: FileInfo): void => {
+    const replaceFileInfo = (fileInfos: RefFileInfos, name: string, info: FileInfo): void => {
         const pos = fileInfos.value.findIndex((info) => info.name === name);
         fileInfos.value.splice(pos, 1, info);
     }
@@ -51,3 +30,5 @@ const useFileInfos = () => {
 }
 
 export default useFileInfos;
+
+export { RefFileInfos };

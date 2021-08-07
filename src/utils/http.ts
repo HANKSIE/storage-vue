@@ -1,5 +1,6 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import logout from "@/action/logout";
+import apiToken from "./token/apiToken";
 
 const http: AxiosInstance = axios.create();
 
@@ -8,7 +9,7 @@ http.defaults.withCredentials = true;
 
 http.interceptors.request.use((config: AxiosRequestConfig) => {
 
-  const token = localStorage.getItem('token');
+  const token = apiToken.value;
 
   if (token) {
      config.headers['Authorization'] = token;
@@ -29,7 +30,7 @@ http.interceptors.response.use(
       logout();
     }
     if(err.response?.status == 403){
-      //forbidden handle
+      logout();
     }
     return Promise.reject(err);
   }

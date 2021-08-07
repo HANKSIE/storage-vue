@@ -21,6 +21,7 @@ import { defineComponent, ref } from "vue";
 import authApi from "@/utils/api/auth";
 import { useRouter } from "vue-router";
 import { useStore } from "@/store";
+import apiToken from "@/utils/token/apiToken";
 
 export default defineComponent({
   setup() {
@@ -35,7 +36,8 @@ export default defineComponent({
         const res = await authApi.login(email.value, password.value);
         const { token, user } = res.data;
 
-        localStorage.setItem("token", token);
+        apiToken.set(token);
+
         auth.setUser(user);
 
         router.push({ name: "user_file" });

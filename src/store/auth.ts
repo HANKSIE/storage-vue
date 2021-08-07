@@ -11,9 +11,11 @@ const originState: State = {
 
 const state = reactive(originState);
 
-const setUser = (user: User|undefined) => state.user = user;
+const setUser = (user: User) => state.user = user;
+const removeUser = () => state.user = undefined;
 
 export default { 
     state: readonly(state),
     setUser,
+    removeUser
 };

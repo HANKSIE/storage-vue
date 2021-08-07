@@ -31,24 +31,40 @@
           >
           <q-td key="size" :props="props"> {{ props.row.size }}</q-td>
         </q-tr>
-        <!-- 工具列 -->
       </template>
     </q-table>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "@vue/runtime-core";
+import { defineComponent, onMounted, toRefs } from "@vue/runtime-core";
 import getMimeIcon from "./utils/getMimeIcon";
-import { columns } from "./config";
+import { columns } from "./config/widget";
 import useFileInfos from "./composition/fileInfos";
 import useSelected from "./composition/selected";
+import list from "./methods/list";
+import usePwd from "./composition/pwd";
 
 export default defineComponent({
-  setup() {
+  props: {
+    type: {
+      type: String,
+      require: true,
+    },
+    id: {
+      type: Number,
+      require: true,
+    },
+  },
+  setup(props) {
+    const { type, id } = toRefs(props);
     const { fileInfos } = useFileInfos();
-
     const { selected } = useSelected();
+    const { pwdStr } = usePwd();
+
+    onMounted(() => {
+      list(fileInfos, type.value!, id.value!, pwdStr.value);
+    });
 
     return {
       columns,

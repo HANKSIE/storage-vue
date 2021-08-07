@@ -1,9 +1,6 @@
-import ProgressRecord from "../ProgressRecord";
-
-class SelfRecord extends ProgressRecord {
-    public text(): string {
-        return "The destination folder is the same as the source folder.";
-    }
+import FileInfo from "../../../type/fileInfo";
+interface SelfRecord {
+    fileInfo: FileInfo;
 }
 
 export default SelfRecord;

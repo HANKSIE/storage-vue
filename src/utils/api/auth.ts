@@ -1,10 +1,9 @@
 import http from "@/utils/http";
-import { LoginResponse } from "@/type/response/auth"
+import { LoadUserResponse, LoginResponse } from "@/type/response/auth"
 import { AxiosResponse } from "axios";
-import User from "@/type/user";
 
 const api = {
-    loadUser(): Promise<AxiosResponse<User>> {
+  loadUser(): Promise<AxiosResponse<LoadUserResponse>> {
     return http.get("user");
   },
 

@@ -1,4 +1,4 @@
-import mimeIcon from "@/config/mimeIcon";
+import mimeIcon from "../config/mimeIcon";
 
 const getMimeIcon = (mime: string): File => {
     const [type, verbose] = mime.split("/");

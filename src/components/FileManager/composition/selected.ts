@@ -1,10 +1,12 @@
-import { FileInfo } from "@/type/fileManager"
-import { ref } from "vue"
+import FileInfo from "../type/fileInfo";
+import { ref, Ref } from "vue"
+
+type RefSelected = Ref<FileInfo[]>;
 
 const useSelected = () => {
-    const selected = ref<FileInfo[]>([]);    
+    const selected: RefSelected = ref<FileInfo[]>([]);    
 
-    const clearSelected = () => selected.value = [];
+    const clearSelected = (selected: RefSelected) => selected.value = [];
 
     return {
         selected,
@@ -13,3 +15,4 @@ const useSelected = () => {
 }
 
 export default useSelected;
+export { RefSelected };

@@ -3,7 +3,11 @@ export default class PathHelper {
         path = path.replace(/\\+/g, "/");
         path = path.replace(/\/+/g, "/");
         return path;
+    }
 
+    static concat(...args: string[]): string{
+        const str = args.reduce((carry, value) => `${carry}/${value}`);
+        return PathHelper.format(str);
     }
 
     static extension(name: string) {

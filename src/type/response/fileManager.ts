@@ -1,4 +1,4 @@
-import { FileInfo } from "../fileManager";
+import FileInfo from "@/components/FileManager/type/fileInfo";
 
 export interface ListResponse {
     fileInfos: FileInfo[]

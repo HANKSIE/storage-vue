@@ -26,7 +26,7 @@
 
 <script lang="ts">
 import { ref, defineComponent } from "vue";
-import logout from "@/action/logout";
+import logout from "@/utils/action/logout";
 
 export default defineComponent({
   setup() {

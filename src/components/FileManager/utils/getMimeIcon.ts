@@ -16,7 +16,7 @@ const getMimeIcon = (mime: string): File => {
         icon = mimeIcon["default"];
     }
     
-    return require(`@/assets/file/${icon}.png`);
+    return require(`../assets/images/file/${icon}.png`);
 }
 
 export default getMimeIcon;

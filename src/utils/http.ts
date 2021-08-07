@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
-import logout from "@/action/logout";
+import logout from "./action/logout";
 import apiToken from "./token/apiToken";
 
 const http: AxiosInstance = axios.create();

@@ -12,7 +12,7 @@ export default defineComponent({
   components: { FileManager },
   setup() {
     const { auth } = useStore();
-    console.log(auth.state.user);
+
     return {
       type: "user",
       id: auth.state.user?.id,

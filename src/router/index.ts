@@ -21,7 +21,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: "file",
         name: "user_file",
-        component: FileManager
+        component: FileManager,
       },
       {
         path: "setting",
@@ -59,35 +59,36 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
 
+  const requireAuth = to.matched[0].meta.requireAuth;
   const { auth } = useStore();
-  if (to.matched[0].meta.requireAuth && apiToken.value && !auth.state.user) {
+
+  if(apiToken.value && !auth.state.user){
+    //load user
     try {
       const res = await authApi.loadUser();
       const { user } = res.data;
       auth.setUser(user);
 
-      if (to.name == "login") {
-        //已登入卻進入登入頁面
-        next({ name: "user_file" });
-      } else {
-        next();
-      }
     } catch (err) {
       console.error(err);
-
-      const httpError = err as AxiosError;
-      
-      if (httpError.response?.status == 401) {
-        //沒有登入
-        next({ name: "login" });
-      } else {
-        //其他錯誤
-        next();
-      }
     }
-  }else {
-    next();
   }
+
+  if (to.name == "login" && auth.state.user) {
+    console.log('已登入卻進入登入頁面')
+    //有權限卻進入登入頁面
+    return next({ name: "user_file" });
+  }
+
+  if (requireAuth) {
+    if(!apiToken.value && !auth.state.user){
+      console.log('unauthorization');
+      return next({ name: "login" });
+    }
+    return next();
+  }
+
+  return next();
 });
 
 export default router;

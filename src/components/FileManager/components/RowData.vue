@@ -14,7 +14,7 @@
           <template v-if="props.row.mime == 'directory'">
             <link-text
               class="ellipsis"
-              style="width: 50px"
+              style="width: 100px"
               @click="cd(props.row.name)"
             >
               {{ props.row.name }}
@@ -33,7 +33,7 @@
   </q-tr>
 </template>
 <script lang="ts">
-import { defineComponent, PropType, toRefs } from "vue";
+import { defineComponent, toRefs } from "vue";
 import pathHelper from "../utils/path";
 import getMimeIcon from "../utils/getMimeIcon";
 import LinkText from "./LinkText.vue";

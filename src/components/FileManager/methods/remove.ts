@@ -1,23 +1,20 @@
 import fileManagerApi from "@/utils/api/filemanager"; 
-import useFileInfos, { RefFileInfos } from "../composition/fileInfos";
-import useSelected, { RefSelected } from "../composition/selected";
+import useFileInfos, { FileInfosRef } from "../composition/fileInfos";
+import useSelected, { SelectedRef } from "../composition/selected";
+import RemoveData from "../type/request/RemoveData";
 
 const { removeFileInfos } = useFileInfos();
 const { clearSelected } = useSelected();
 
-const remove = async (refFileInfos: RefFileInfos, refSelected: RefSelected, type: string, id: number, dir: string): Promise<void> => {
+const remove = async (fileInfosRef: FileInfosRef, SelectedRef: SelectedRef, data: RemoveData): Promise<void> => {
     try{
-        const filenames = refSelected.value.map(info => info.name);
-        const res = await fileManagerApi.remove({type, id, dir, filenames});
-        const { fails, notExists } = res.data;
 
-        const removeFileNames = refFileInfos.value
-        .filter(info => !fails.includes(info.name) || notExists.includes(info.name))
-        .map(info => info.name);
+        const res = await fileManagerApi.remove(data);
+        const { successes } = res.data;
 
-        removeFileInfos(refFileInfos, removeFileNames);
+        removeFileInfos(fileInfosRef, successes);
         
-        clearSelected(refSelected);
+        clearSelected(SelectedRef);
     }catch(err){
         console.error(err);
     }

@@ -3,12 +3,12 @@ import { ref, Ref } from "vue";
 
 type Selected = FileInfo[];
 
-type RefSelected = Ref<Selected>;
+type SelectedRef = Ref<Selected>;
 
 const useSelected = () => {
-    const selected: RefSelected = ref<Selected>([]);    
+    const selected: SelectedRef = ref<Selected>([]);    
 
-    const clearSelected = (selected: RefSelected) => selected.value = [];
+    const clearSelected = (selected: SelectedRef) => selected.value = [];
 
     return {
         selected,
@@ -17,4 +17,4 @@ const useSelected = () => {
 }
 
 export default useSelected;
-export { Selected, RefSelected };
+export { Selected, SelectedRef };

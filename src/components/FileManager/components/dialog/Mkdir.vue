@@ -2,12 +2,12 @@
   <q-dialog ref="dialogRef" @hide="onDialogHide">
     <q-card class="q-dialog-plugin">
       <q-card-section class="row items-center">
-        <span class="text-h6">重新命名</span>
+        <span class="text-h6">新增資料夾</span>
       </q-card-section>
       <q-card-section class="row justify-center items-center">
-        <q-input filled v-model="filename" label="檔案名稱">
+        <q-input filled v-model="dirname" label="資料夾名稱">
           <template v-slot:prepend>
-            <q-icon name="drive_file_rename_outline" />
+            <q-icon name="create_new_folder" />
           </template>
         </q-input>
       </q-card-section>
@@ -26,18 +26,18 @@ import { defineComponent, ref } from "vue";
 export default defineComponent({
   emits: [...useDialogPluginComponent.emits],
   setup() {
-    const filename = ref<string>("");
+    const dirname = ref<string>("");
 
     const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
       useDialogPluginComponent();
 
     const onOKClick = (): void => {
-      onDialogOK(filename.value);
-      filename.value = "";
+      onDialogOK(dirname.value);
+      dirname.value = "";
     };
 
     return {
-      filename,
+      dirname,
       dialogRef,
       onDialogHide,
       onOKClick,

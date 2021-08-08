@@ -8,26 +8,26 @@ import UploadResponse from "./response/UploadResponse";
 import DownloadResponse from "./response/DownloadResponse";
 import RemoveResponse from "./response/RemoveResponse";
 
-import CopyMoveRequest from "./request/CopyMoveRequest";
-import ListRequest from "./request/ListRequest";
-import MakeDirRequest from "./request/MakeDirRequest";
-import RenameRequest from "./request/RenameRequest";
-import UploadRequest from "./request/UploadRequest";
-import DownloadRequest from "./request/DownloadRequest";
-import RemoveRequest from "./request/RemoveRequest";
+import CopyMoveData from "./request/CopyMoveData";
+import ListData from "./request/ListData";
+import MakeDirData from "./request/MakeDirData";
+import RenameData from "./request/RenameData";
+import UploadData from "./request/UploadData";
+import DownloadData from "./request/DownloadData";
+import RemoveData from "./request/RemoveData";
 
 // fetch/axios response
 type Response<T> = Promise<AxiosResponse<T>>;
 
 type Api = {
-    list(data: ListRequest): Response<ListResponse>
-    mkdir(data: MakeDirRequest): Response<MakeDirResponse>
-    remove(data: RemoveRequest): Response<RemoveResponse>
-    move(data: CopyMoveRequest): Response<CopyMoveResponse>
-    copy(data: CopyMoveRequest): Response<CopyMoveResponse>
-    rename(data: RenameRequest): Response<RenameResponse>
-    download(data: DownloadRequest): Response<DownloadResponse>
-    upload(data: UploadRequest): Response<UploadResponse>
+    list(data: ListData): Response<ListResponse>
+    mkdir(data: MakeDirData): Response<MakeDirResponse>
+    remove(data: RemoveData): Response<RemoveResponse>
+    move(data: CopyMoveData): Response<CopyMoveResponse>
+    copy(data: CopyMoveData): Response<CopyMoveResponse>
+    rename(data: RenameData): Response<RenameResponse>
+    download(data: DownloadData): Response<DownloadResponse>
+    upload(data: UploadData): Response<UploadResponse>
 }
 
 export default Api;

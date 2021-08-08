@@ -13,7 +13,7 @@
         >
           <template v-slot:top>
             <!-- 工具列 -->
-            <tool-bar :selected="selected" @remove="rm" />
+            <tool-bar :selected="selected" @remove="rm" @mkdir="mkdir" />
             <!-- 麵包屑導航 -->
             <bread-crumbs-navigate
               :nodes="pwdBreadcrumbNodes"
@@ -43,6 +43,9 @@ import RowData from "./components/RowData.vue";
 import list from "./methods/list";
 import changeDir from "./methods/changeDir";
 import remove from "./methods/remove";
+import makedir from "./methods/makedir";
+
+import optionConfig from "./config/options";
 
 export default defineComponent({
   components: { BreadCrumbsNavigate, ToolBar, RowData },
@@ -63,15 +66,39 @@ export default defineComponent({
     const { pwd, pwdStr, pwdBreadcrumbNodes } = usePwd();
 
     onMounted(() => {
-      list(fileInfos, type.value!, id.value!, pwdStr.value);
+      list(fileInfos, {
+        type: type.value!,
+        id: id.value!,
+        dir: pwdStr.value,
+        options: optionConfig.LIST_ALL,
+      });
     });
 
     const cd = (dir: string): void => {
-      changeDir(pwd, fileInfos, type.value!, id.value!, dir);
+      changeDir(pwd, fileInfos, {
+        type: type.value!,
+        id: id.value!,
+        dir,
+        options: optionConfig.LIST_ALL,
+      });
     };
 
     const rm = (): void => {
-      remove(fileInfos, selected, type.value!, id.value!, pwdStr.value);
+      remove(fileInfos, selected, {
+        type: type.value!,
+        id: id.value!,
+        dir: pwdStr.value,
+        filenames: selected.value.map((info) => info.name),
+      });
+    };
+
+    const mkdir = (filename: string): void => {
+      makedir(fileInfos, {
+        type: type.value!,
+        id: id.value!,
+        dir: pwdStr.value,
+        filename,
+      });
     };
 
     return {
@@ -82,6 +109,7 @@ export default defineComponent({
       pwdStr,
       cd,
       rm,
+      mkdir,
     };
   },
 });

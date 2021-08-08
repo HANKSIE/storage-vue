@@ -1,6 +1,5 @@
-import FileInfo from "@/components/FileManager/type/fileInfo";
-
 type RemoveResponse = {
+    successes: string[],
     fails: string[],
     notExists: string[]
 }

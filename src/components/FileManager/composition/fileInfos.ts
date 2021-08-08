@@ -1,21 +1,21 @@
 import FileInfo from "../type/fileInfo";
 import { ref, Ref } from "vue"
 
-type RefFileInfos = Ref<FileInfo[]>;
+type FileInfosRef = Ref<FileInfo[]>;
 
 const useFileInfos = () => {
-    const fileInfos: RefFileInfos = ref<FileInfo[]>([]);
+    const fileInfos: FileInfosRef = ref<FileInfo[]>([]);
 
-    const setFileInfos = (fileInfos: RefFileInfos, infos: FileInfo[]): void => {
+    const setFileInfos = (fileInfos: FileInfosRef, infos: FileInfo[]): void => {
         fileInfos.value = infos;
     }
-    const removeFileInfos = (fileInfos: RefFileInfos, filenames: string[]): void => {
+    const removeFileInfos = (fileInfos: FileInfosRef, filenames: string[]): void => {
         fileInfos.value = fileInfos.value.filter((info) => !filenames.includes(info.name));
     }
-    const addFileInfos = (fileInfos: RefFileInfos, infos: FileInfo[]): void => {
-        fileInfos.value = fileInfos.value.concat(infos);
+    const addFileInfos = (fileInfos: FileInfosRef, infos: FileInfo[]): void => {
+        fileInfos.value = infos.concat(fileInfos.value);
     }
-    const replaceFileInfo = (fileInfos: RefFileInfos, name: string, info: FileInfo): void => {
+    const replaceFileInfo = (fileInfos: FileInfosRef, name: string, info: FileInfo): void => {
         const pos = fileInfos.value.findIndex((info) => info.name === name);
         fileInfos.value.splice(pos, 1, info);
     }
@@ -31,4 +31,4 @@ const useFileInfos = () => {
 
 export default useFileInfos;
 
-export { RefFileInfos };
+export { FileInfosRef };

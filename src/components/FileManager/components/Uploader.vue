@@ -1,13 +1,13 @@
 <template>
   <input
     type="file"
-    ref="refUpload"
+    ref="uploadRef"
     style="display: none"
     :webkitdirectory="type === 'folder'"
     :multiple="type === 'file' && multiple"
     @change="upload"
   />
-  <span @click="refUpload.click()">{{ text }}</span>
+  <span @click="uploadRef.click()">{{ text }}</span>
 </template>
 
 <script lang="ts">
@@ -30,15 +30,15 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
-    const refUpload = ref<HTMLInputElement>();
+    const uploadRef = ref<HTMLInputElement>();
 
     const upload = () => {
-      const files = (refUpload.value as HTMLInputElement).files;
+      const files = (uploadRef.value as HTMLInputElement).files;
       emit("upload", files);
     };
 
     return {
-      refUpload,
+      uploadRef,
       upload,
     };
   },

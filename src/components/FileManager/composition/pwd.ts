@@ -3,9 +3,9 @@ import { ref, Ref, computed, ComputedRef } from "vue";
 
 type Pwd = string[];
 
-type RefPwd = Ref<Pwd>;
+type PwdRef = Ref<Pwd>;
 
-type RefPwdStr = ComputedRef<string>;
+type PwdStrRef = ComputedRef<string>;
 
 type PwdBreadCrumbNode = {
     text: string;
@@ -13,10 +13,10 @@ type PwdBreadCrumbNode = {
 }
 
 const usePwd = () => {
-    const pwd: RefPwd = ref<Pwd>([]);
-    const pwdStr: RefPwdStr = computed(() => "/" + pwd.value.join("/") + (pwd.value.length > 0 ? "/": ""));
+    const pwd: PwdRef = ref<Pwd>([]);
+    const pwdStr: PwdStrRef = computed(() => "/" + pwd.value.join("/") + (pwd.value.length > 0 ? "/": ""));
     
-    const setPwdByPath = (pwd: RefPwd, path: string) => {
+    const setPwdByPath = (pwd: PwdRef, path: string) => {
         path = PathHelper.format(path);
         pwd.value = path.split("/").filter((el) => !!el);
     }
@@ -47,4 +47,4 @@ const usePwd = () => {
 
 export default usePwd;
 
-export { Pwd, RefPwd, RefPwdStr, PwdBreadCrumbNode }
+export { Pwd, PwdRef, PwdStrRef, PwdBreadCrumbNode }

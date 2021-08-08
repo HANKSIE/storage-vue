@@ -1,12 +1,7 @@
 <template>
   <q-toolbar class="q-gutter-sm">
     <!-- 新增資料夾 -->
-    <q-btn
-      flat
-      label="新增資料夾"
-      icon="add"
-      @click="toggleMkdirDialog = true"
-    />
+    <q-btn flat label="新增資料夾" icon="add" @click="openMkdirDialog" />
     <template v-if="selectedFileInfos.length === 0">
       <!-- 上傳 -->
       <q-btn-dropdown label="上傳" icon="upload">
@@ -30,40 +25,29 @@
         flat
         label="重新命名"
         icon="drive_file_rename_outline"
-        @click="toggleRenameDialog = true"
+        @click="openRenameDialog"
       />
     </template>
     <template v-if="selectedFileInfos.length > 0">
       <!-- 下載 -->
-      <q-btn flat label="下載" icon="download" @click="download" />
+      <q-btn flat label="下載" icon="download" />
       <!-- 刪除 -->
-      <q-btn
-        flat
-        label="刪除"
-        icon="delete"
-        @click="toggleRemoveDialog = true"
-      />
+      <q-btn flat label="刪除" icon="delete" @click="openRemoveDialog" />
       <!-- 移動 -->
-      <q-btn
-        flat
-        label="移動"
-        icon="drive_file_move"
-        @click="toggleSecondaryFileManager = true"
-      />
+      <q-btn flat label="移動" icon="drive_file_move" />
       <!-- 複製 -->
-      <q-btn
-        flat
-        label="複製"
-        icon="file_copy"
-        @click="toggleSecondaryFileManager = true"
-      />
+      <q-btn flat label="複製" icon="file_copy" />
     </template>
   </q-toolbar>
 </template>
 <script lang="ts">
-import { defineComponent, PropType, ref, toRefs } from "vue";
+import { defineComponent, PropType, toRefs } from "vue";
 import { Selected } from "../composition/selected";
 import Uploader from "./Uploader.vue";
+import MkdirDialog from "./dialog/Mkdir.vue";
+import RenameDialog from "./dialog/Rename.vue";
+import RemoveDialog from "./dialog/Remove.vue";
+import { useQuasar } from "quasar";
 
 export default defineComponent({
   components: { Uploader },
@@ -78,23 +62,43 @@ export default defineComponent({
   setup(props, { emit }) {
     const { selected } = toRefs(props);
 
-    const mkdir = (): void => emit("mkdir");
-    const upload = (): void => emit("upload");
-    const rename = (): void => emit("rename");
+    const $q = useQuasar();
 
-    const toggleSecondaryFileManager = ref<boolean>(false);
-    const toggleRenameDialog = ref<boolean>(false);
-    const toggleRemoveDialog = ref<boolean>(false);
-    const toggleMkdirDialog = ref<boolean>(false);
+    const openMkdirDialog = (): void => {
+      $q.dialog({
+        component: MkdirDialog,
+      }).onOk((dirname: string) => {
+        mkdir(dirname);
+      });
+    };
+
+    const openRenameDialog = (): void => {
+      $q.dialog({
+        component: RenameDialog,
+      }).onOk((filename: string) => {
+        rename(filename);
+      });
+    };
+
+    const openRemoveDialog = (): void => {
+      $q.dialog({
+        component: RemoveDialog,
+      }).onOk(() => {
+        remove();
+      });
+    };
+
+    const mkdir = (dirname: string): void => emit("mkdir", dirname);
+    const upload = (): void => emit("upload");
+    const rename = (filename: string): void => emit("rename", filename);
 
     const remove = (): void => emit("remove");
 
     return {
       selectedFileInfos: selected,
-      toggleSecondaryFileManager,
-      toggleRenameDialog,
-      toggleRemoveDialog,
-      toggleMkdirDialog,
+      openMkdirDialog,
+      openRenameDialog,
+      openRemoveDialog,
       mkdir,
       upload,
       rename,

@@ -6,13 +6,13 @@ import UploadResponse from "@/components/FileManager/type/response/UploadRespons
 import DownloadResponse from "@/components/FileManager/type/response/DownloadResponse";
 import RemoveResponse from "@/components/FileManager/type/response/RemoveResponse";
 
-import CopyMoveRequest from "@/components/FileManager/type/request/CopyMoveRequest";
-import ListRequest from "@/components/FileManager/type/request/ListRequest";
-import MakeDirRequest from "@/components/FileManager/type/request/MakeDirRequest";
-import RenameRequest from "@/components/FileManager/type/request/RenameRequest";
-import UploadRequest from "@/components/FileManager/type/request/UploadRequest";
-import DownloadRequest from "@/components/FileManager/type/request/DownloadRequest";
-import RemoveRequest from "@/components/FileManager/type/request/RemoveRequest";
+import CopyMoveData from "@/components/FileManager/type/request/CopyMoveData";
+import ListData from "@/components/FileManager/type/request/ListData";
+import MakeDirData from "@/components/FileManager/type/request/MakeDirData";
+import RenameData from "@/components/FileManager/type/request/RenameData";
+import UploadData from "@/components/FileManager/type/request/UploadData";
+import DownloadData from "@/components/FileManager/type/request/DownloadData";
+import RemoveData from "@/components/FileManager/type/request/RemoveData";
 
 
 import http from "@/utils/http";
@@ -21,21 +21,21 @@ import FileManagerApi from "@/components/FileManager/type/api";
 
 
 const api: FileManagerApi = {
-    list(data: ListRequest): Promise<AxiosResponse<ListResponse>> {
+    list(data: ListData): Promise<AxiosResponse<ListResponse>> {
       const { type, id, dir, options } = data;
       return http.post(`${type}/${id}/files`,{
         dir,
         options,
       });
     },
-    mkdir(data: MakeDirRequest): Promise<AxiosResponse<MakeDirResponse>>{
+    mkdir(data: MakeDirData): Promise<AxiosResponse<MakeDirResponse>>{
       const { type, id, dir, filename } = data;
       return http.post(`${type}/${id}/files/mkdir`, {
         dir,
         filename
       });
     },
-    remove(data: RemoveRequest): Promise<AxiosResponse<RemoveResponse>> {
+    remove(data: RemoveData): Promise<AxiosResponse<RemoveResponse>> {
       const { type, id, dir, filenames } = data;
       return http.delete(`${type}/${id}/files/remove`, {
         data: {
@@ -44,7 +44,7 @@ const api: FileManagerApi = {
         }
       });
     },
-    move(data: CopyMoveRequest): Promise<AxiosResponse<CopyMoveResponse>>{
+    move(data: CopyMoveData): Promise<AxiosResponse<CopyMoveResponse>>{
       const { type, id, fromDir, toDir, filenames, options } = data;
       return http.put(`${type}/${id}/files/move`, {
         fromDir,
@@ -53,7 +53,7 @@ const api: FileManagerApi = {
         options
       });
     },
-    copy(data: CopyMoveRequest): Promise<AxiosResponse<CopyMoveResponse>>{
+    copy(data: CopyMoveData): Promise<AxiosResponse<CopyMoveResponse>>{
       const { type, id, fromDir, toDir, filenames, options } = data;
       return http.post(`${type}/${id}/files/copy`, {
         fromDir,
@@ -62,7 +62,7 @@ const api: FileManagerApi = {
         options
       });
     },
-    rename(data: RenameRequest): Promise<AxiosResponse<RenameResponse>>{
+    rename(data: RenameData): Promise<AxiosResponse<RenameResponse>>{
       const { type, id, dir, oldFileName, newFileName } = data;
       return http.put(`${type}/${id}/files/rename`, {
         dir,
@@ -70,7 +70,7 @@ const api: FileManagerApi = {
         newFileName
       });
     },
-    download(data: DownloadRequest): Promise<AxiosResponse<DownloadResponse>> {
+    download(data: DownloadData): Promise<AxiosResponse<DownloadResponse>> {
       const { type, id, dir, filenames } = data;
       return http.post(`${type}/${id}/files/download`,
         {
@@ -82,7 +82,7 @@ const api: FileManagerApi = {
         }
       );
     },
-    upload(data: UploadRequest): Promise<AxiosResponse<UploadResponse>>{
+    upload(data: UploadData): Promise<AxiosResponse<UploadResponse>>{
       const { type, id, dir, filePaths, files, options } = data;
       const formData = new FormData();
       for(let i=0; i<filePaths.length; i++){

@@ -1,15 +1,9 @@
 <template>
   <q-dialog ref="dialogRef" @hide="onDialogHide">
     <q-card class="q-dialog-plugin">
-      <q-card-section class="row items-center">
-        <span class="text-h6">重新命名</span>
-      </q-card-section>
       <q-card-section class="row justify-center items-center">
-        <q-input filled v-model="filename" label="檔案名稱">
-          <template v-slot:prepend>
-            <q-icon name="drive_file_rename_outline" />
-          </template>
-        </q-input>
+        <q-icon class="q-mr-sm" size="sm" name="delete" />
+        <span class="text-h6">確定刪除這些檔案?</span>
       </q-card-section>
 
       <q-card-actions align="right">
@@ -21,23 +15,19 @@
 </template>
 <script lang="ts">
 import { useDialogPluginComponent } from "quasar";
-import { defineComponent, ref } from "vue";
+import { defineComponent } from "vue";
 
 export default defineComponent({
   emits: [...useDialogPluginComponent.emits],
   setup() {
-    const filename = ref<string>("");
-
     const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
       useDialogPluginComponent();
 
     const onOKClick = (): void => {
-      onDialogOK(filename.value);
-      filename.value = "";
+      onDialogOK();
     };
 
     return {
-      filename,
       dialogRef,
       onDialogHide,
       onOKClick,

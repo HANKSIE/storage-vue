@@ -13,7 +13,12 @@
         >
           <template v-slot:top>
             <!-- 工具列 -->
-            <tool-bar :selected="selected" @remove="rm" @mkdir="mkdir" />
+            <tool-bar
+              :selected="selected"
+              @remove="rm"
+              @mkdir="mkdir"
+              @upload="upload"
+            />
             <!-- 麵包屑導航 -->
             <bread-crumbs-navigate
               :nodes="pwdBreadcrumbNodes"
@@ -102,13 +107,7 @@ export default defineComponent({
       });
     };
 
-    const upload = (files: FileList): void => {
-      const filePaths = Array.from(files).map((f) => {
-        return f.webkitRelativePath.length === 0
-          ? f.name
-          : f.webkitRelativePath;
-      });
-
+    const upload = (filePaths: string[], files: File[]): void => {
       uploadFiles(fileInfos, {
         type: type.value!,
         id: id.value!,
@@ -128,6 +127,7 @@ export default defineComponent({
       cd,
       rm,
       mkdir,
+      upload,
     };
   },
 });

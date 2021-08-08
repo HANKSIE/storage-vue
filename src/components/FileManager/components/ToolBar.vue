@@ -8,12 +8,12 @@
         <q-list>
           <q-item clickable>
             <q-item-section>
-              <uploader type="file" text="檔案" multiple />
+              <uploader type="file" text="檔案" multiple @upload="upload" />
             </q-item-section>
           </q-item>
           <q-item clickable>
             <q-item-section>
-              <uploader type="folder" text="資料夾" />
+              <uploader type="folder" text="資料夾" @upload="upload" />
             </q-item-section>
           </q-item>
         </q-list>
@@ -89,7 +89,8 @@ export default defineComponent({
     };
 
     const mkdir = (dirname: string): void => emit("mkdir", dirname);
-    const upload = (): void => emit("upload");
+    const upload = (filePaths: string[], files: File[]): void =>
+      emit("upload", filePaths, files);
     const rename = (filename: string): void => emit("rename", filename);
 
     const remove = (): void => emit("remove");

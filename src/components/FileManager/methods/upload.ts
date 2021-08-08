@@ -7,7 +7,7 @@ const { addFileInfos } = useFileInfos();
 const upload = async (fileInfosRef: FileInfosRef, data: UploadData): Promise<void> => {
     try{
         const res = await fileManagerApi.upload(data);
-        const { exists, fileInfos } = res.data;
+        const { fails, exists, fileInfos } = res.data;
 
         addFileInfos(fileInfosRef, fileInfos);
 

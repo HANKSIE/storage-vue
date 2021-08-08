@@ -33,8 +33,15 @@ export default defineComponent({
     const uploadRef = ref<HTMLInputElement>();
 
     const upload = () => {
-      const files = (uploadRef.value as HTMLInputElement).files;
-      emit("upload", files);
+      const fileList = (uploadRef.value as HTMLInputElement).files;
+      const files = Array.from(fileList || []);
+
+      const filePaths = files.map((f) => {
+        return f.webkitRelativePath.length === 0
+          ? f.name
+          : f.webkitRelativePath;
+      });
+      emit("upload", filePaths, files);
     };
 
     return {

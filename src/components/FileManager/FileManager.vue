@@ -44,6 +44,7 @@ import list from "./methods/list";
 import changeDir from "./methods/changeDir";
 import remove from "./methods/remove";
 import makedir from "./methods/makedir";
+import uploadFiles from "./methods/upload";
 
 import optionConfig from "./config/options";
 
@@ -98,6 +99,23 @@ export default defineComponent({
         id: id.value!,
         dir: pwdStr.value,
         filename,
+      });
+    };
+
+    const upload = (files: FileList): void => {
+      const filePaths = Array.from(files).map((f) => {
+        return f.webkitRelativePath.length === 0
+          ? f.name
+          : f.webkitRelativePath;
+      });
+
+      uploadFiles(fileInfos, {
+        type: type.value!,
+        id: id.value!,
+        dir: pwdStr.value,
+        filePaths,
+        files,
+        options: optionConfig.OVERRIDE_NONE,
       });
     };
 

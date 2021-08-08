@@ -36,7 +36,6 @@
 import { defineComponent, PropType, toRefs } from "vue";
 import pathHelper from "../utils/path";
 import getMimeIcon from "../utils/getMimeIcon";
-import { RefPwdStr } from "../composition/pwd";
 import LinkText from "./LinkText.vue";
 
 export default defineComponent({
@@ -48,7 +47,7 @@ export default defineComponent({
       require: true,
     },
     pwdStr: {
-      type: Object as PropType<RefPwdStr>,
+      type: String,
       require: true,
     },
   },

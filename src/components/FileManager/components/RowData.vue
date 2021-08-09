@@ -4,7 +4,7 @@
       <q-checkbox v-model="props.selected" />
     </q-td>
     <q-td key="name" :props="props">
-      <div class="row justify-start full-width">
+      <div class="row justify-start full-width no-wrap">
         <q-img
           :src="getMimeIcon(props.row.mime)"
           width="30px"

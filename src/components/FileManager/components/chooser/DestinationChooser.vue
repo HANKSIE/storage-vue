@@ -14,7 +14,7 @@
     <q-item clickable v-ripple v-for="(fileInfo, i) in fileInfos" :key="i">
       <q-item-section class="row justify-start">
         <!-- folders -->
-        <div class="row">
+        <div class="row no-wrap">
           <q-img
             :src="getMimeIcon(fileInfo.mime)"
             width="30px"

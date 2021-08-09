@@ -167,12 +167,18 @@ export default defineComponent({
           dir: pwdStr.value,
           filenames: selected.value.map((info) => info.name),
         });
+
+        const contentDisposition = res.headers["content-disposition"];
+        const matchUTF8 = contentDisposition.match(/filename\*=utf-8''(.+)/);
+        const match = contentDisposition.match(/filename=(.+)/);
+        const filename = matchUTF8
+          ? decodeURIComponent(matchUTF8[1])
+          : match[1];
+
         const a = document.createElement("a");
         const url = window.URL.createObjectURL(res.data);
         a.href = url;
-        const contentDisposition = res.headers["content-disposition"];
-        const filename = contentDisposition.match(/filename=(.+)/)[1];
-        a.download = decodeURIComponent(filename);
+        a.download = filename;
         a.click();
         window.URL.revokeObjectURL(url);
         clearSelected();

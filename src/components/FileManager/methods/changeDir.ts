@@ -5,9 +5,9 @@ import ListData from "../type/request/ListData";
 
 const { setPwdByPath } = usePwd();
 
-const cd = async (pwdRef: PwdRef, refFileInfos: FileInfosRef, data: ListData): Promise<void> => {
+const changeDir = async (pwdRef: PwdRef, refFileInfos: FileInfosRef, data: ListData): Promise<void> => {
     await list(refFileInfos, data);
     setPwdByPath(pwdRef, data.dir);
 }
 
-export default cd;
+export default changeDir;

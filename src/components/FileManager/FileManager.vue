@@ -19,9 +19,11 @@
               @mkdir="mkdir"
               @upload="upload"
               @download="download"
+              @openDestChooserMove="openDestChooserMove"
+              @openDestChooserCopy="openDestChooserCopy"
             />
             <!-- 麵包屑導航 -->
-            <bread-crumbs-navigate
+            <breadcrumbs-path-link
               :nodes="pwdBreadcrumbNodes"
               @changeDir="cd"
             />
@@ -33,19 +35,41 @@
       </div>
     </div>
   </drop-uploader>
+  <q-drawer
+    v-model="destChooser.toggle"
+    behavior="mobile"
+    overlay
+    side="right"
+    bordered
+  >
+    <destination-chooser
+      :type="type"
+      :id="id"
+      :actionText="destChooser.text"
+      @handle="destChooser.handle"
+      @mkdir="mkdir"
+    />
+  </q-drawer>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, toRefs } from "@vue/runtime-core";
+import {
+  defineComponent,
+  onMounted,
+  reactive,
+  toRefs,
+} from "@vue/runtime-core";
 import { columns } from "./config/widget";
 import useFileInfos from "./composition/fileInfos";
 import useSelected from "./composition/selected";
 import usePwd from "./composition/pwd";
 
-import BreadCrumbsNavigate from "./components/BreadCrumbsNavigate.vue";
+import BreadcrumbsPathLink from "./components/BreadcrumbsPathLink.vue";
+
 import ToolBar from "./components/ToolBar.vue";
 import RowData from "./components/RowData.vue";
 import DropUploader from "./components/DropUploader.vue";
+import DestinationChooser from "./components/chooser/DestinationChooser.vue";
 
 import list from "./methods/list";
 import changeDir from "./methods/changeDir";
@@ -57,7 +81,13 @@ import downloadFiles from "./methods/download";
 import optionConfig from "./config/options";
 
 export default defineComponent({
-  components: { BreadCrumbsNavigate, ToolBar, RowData, DropUploader },
+  components: {
+    BreadcrumbsPathLink,
+    ToolBar,
+    RowData,
+    DropUploader,
+    DestinationChooser,
+  },
   props: {
     type: {
       type: String,
@@ -73,6 +103,13 @@ export default defineComponent({
     const { fileInfos } = useFileInfos();
     const { selected } = useSelected();
     const { pwd, pwdStr, pwdBreadcrumbNodes } = usePwd();
+    const destChooser = reactive({
+      toggle: false,
+      text: "",
+      handle: (): void => {
+        //
+      },
+    });
 
     onMounted(() => {
       list(fileInfos, {
@@ -130,17 +167,40 @@ export default defineComponent({
       });
     };
 
+    const move = (): void => {
+      //
+    };
+
+    const copy = (): void => {
+      //
+    };
+
+    const openDestChooserMove = () => {
+      destChooser.text = "Move Here";
+      destChooser.handle = move;
+      destChooser.toggle = true;
+    };
+
+    const openDestChooserCopy = () => {
+      destChooser.text = "Copy Here";
+      destChooser.handle = copy;
+      destChooser.toggle = true;
+    };
+
     return {
       columns,
       fileInfos,
       selected,
       pwdBreadcrumbNodes,
       pwdStr,
+      destChooser,
       cd,
       rm,
       mkdir,
       upload,
       download,
+      openDestChooserMove,
+      openDestChooserCopy,
     };
   },
 });

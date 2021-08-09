@@ -34,7 +34,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, toRefs } from "vue";
-import pathHelper from "../utils/path";
+import PathHelper from "../utils/path";
 import getMimeIcon from "../utils/getMimeIcon";
 import LinkText from "./LinkText.vue";
 
@@ -54,14 +54,14 @@ export default defineComponent({
   setup(props, { emit }) {
     const { properties, pwdStr } = toRefs(props);
     const cd = (dirname: string): void => {
-      const dir = pathHelper.concat(pwdStr.value!, dirname);
+      const dir = PathHelper.concat(pwdStr.value!, dirname);
       emit("changeDir", dir);
     };
     return {
       props: properties,
       cd,
       getMimeIcon,
-      pathHelper,
+      PathHelper,
     };
   },
 });

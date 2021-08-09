@@ -4,7 +4,7 @@ import MakeDirData from "../type/request/MakeDirData";
 
 const { addFileInfos } = useFileInfos();
 
-const list = async (fileInfosRef: FileInfosRef, data: MakeDirData): Promise<void> => {
+const makedir = async (fileInfosRef: FileInfosRef, data: MakeDirData): Promise<void> => {
     try{
         const res = await fileManagerApi.mkdir(data);
         const { fileInfo, isSuccess, exist } = res.data;
@@ -22,4 +22,4 @@ const list = async (fileInfosRef: FileInfosRef, data: MakeDirData): Promise<void
     }
 }
 
-export default list;
+export default makedir;

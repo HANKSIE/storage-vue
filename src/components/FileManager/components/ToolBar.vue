@@ -2,7 +2,7 @@
   <q-toolbar class="q-gutter-sm">
     <!-- 新增資料夾 -->
     <q-btn flat label="新增資料夾" icon="add" @click="openMkdirDialog" />
-    <template v-if="selectedFileInfos.length === 0">
+    <template v-if="selected.length === 0">
       <!-- 上傳 -->
       <q-btn-dropdown label="上傳" icon="upload">
         <q-list>
@@ -19,7 +19,7 @@
         </q-list>
       </q-btn-dropdown>
     </template>
-    <template v-if="selectedFileInfos.length === 1">
+    <template v-if="selected.length === 1">
       <!-- 重新命名 -->
       <q-btn
         flat
@@ -28,20 +28,25 @@
         @click="openRenameDialog"
       />
     </template>
-    <template v-if="selectedFileInfos.length > 0">
+    <template v-if="selected.length > 0">
       <!-- 下載 -->
       <q-btn flat label="下載" icon="download" @click="download" />
       <!-- 刪除 -->
       <q-btn flat label="刪除" icon="delete" @click="openRemoveDialog" />
       <!-- 移動 -->
-      <q-btn flat label="移動" icon="drive_file_move" />
+      <q-btn
+        flat
+        label="移動"
+        icon="drive_file_move"
+        @click="openDestChooserMove"
+      />
       <!-- 複製 -->
-      <q-btn flat label="複製" icon="file_copy" />
+      <q-btn flat label="複製" icon="file_copy" @click="openDestChooserCopy" />
     </template>
   </q-toolbar>
 </template>
 <script lang="ts">
-import { defineComponent, PropType, toRefs } from "vue";
+import { defineComponent, PropType } from "vue";
 import { Selected } from "../composition/selected";
 import Uploader from "./Uploader.vue";
 import MkdirDialog from "./dialog/Mkdir.vue";
@@ -51,17 +56,22 @@ import { useQuasar } from "quasar";
 
 export default defineComponent({
   components: { Uploader },
-  emits: ["mkdir", "upload", "rename", "download", "remove"],
+  emits: [
+    "mkdir",
+    "upload",
+    "rename",
+    "download",
+    "remove",
+    "openDestChooserMove",
+    "openDestChooserCopy",
+  ],
   props: {
     selected: {
       type: Object as PropType<Selected>,
       require: true,
     },
-    toggleSecondary: Boolean,
   },
   setup(props, { emit }) {
-    const { selected } = toRefs(props);
-
     const $q = useQuasar();
 
     const openMkdirDialog = (): void => {
@@ -88,6 +98,9 @@ export default defineComponent({
       });
     };
 
+    const openDestChooserMove = (): void => emit("openDestChooserMove");
+    const openDestChooserCopy = (): void => emit("openDestChooserCopy");
+
     const mkdir = (dirname: string): void => emit("mkdir", dirname);
     const upload = (filePaths: string[], files: File[]): void =>
       emit("upload", filePaths, files);
@@ -97,7 +110,6 @@ export default defineComponent({
     const remove = (): void => emit("remove");
 
     return {
-      selectedFileInfos: selected,
       openMkdirDialog,
       openRenameDialog,
       openRemoveDialog,
@@ -106,6 +118,8 @@ export default defineComponent({
       rename,
       remove,
       download,
+      openDestChooserMove,
+      openDestChooserCopy,
     };
   },
 });

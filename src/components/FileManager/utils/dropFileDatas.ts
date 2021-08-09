@@ -46,22 +46,21 @@ const getFile = (entry: FileSystemFileEntry): Promise<File> => {
 
   // Get all the entries (files or sub-directories) in a directory
   // by calling readEntries until it returns empty array
-const readAllDirectoryEntries = async (directoryReader: FileSystemDirectoryReader): Promise<FileSystemEntry[]|void> => {
+const readAllDirectoryEntries = async (directoryReader: FileSystemDirectoryReader): Promise<FileSystemEntry[]> => {
     const entries: FileSystemEntry[] = [];
     let readEntries = await readEntriesPromise(directoryReader);
-    if(readEntries){
+    readEntries = readEntries as FileSystemEntry[];
       while (readEntries!.length > 0) {
         entries.push(...readEntries!);
         readEntries = await readEntriesPromise(directoryReader);
       }
       return entries;
-    }
   };
 
   // Wrap readEntries in a promise to make working with readEntries easier
   // readEntries will return only some of the entries in a directory
   // e.g. Chrome returns at most 100 entries at a time
-  const readEntriesPromise = async (directoryReader: FileSystemDirectoryReader): Promise<void | FileSystemEntry[]> => {
+  const readEntriesPromise = async (directoryReader: FileSystemDirectoryReader): Promise<FileSystemEntry[]> => {
     try {
       const result: FileSystemEntry[] = await new Promise((resolve, reject) => {
           directoryReader.readEntries(resolve, reject);
@@ -70,6 +69,7 @@ const readAllDirectoryEntries = async (directoryReader: FileSystemDirectoryReade
       return result;
     } catch (err) {
       console.log(err);
+      return [];
     }
   };
 

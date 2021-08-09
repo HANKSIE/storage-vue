@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md full-width">
+  <drop-uploader @upload="upload" class="full-width">
     <div class="row justify-center">
       <div class="col-10" style="height: 500px">
         <q-table
@@ -31,7 +31,7 @@
         </q-table>
       </div>
     </div>
-  </div>
+  </drop-uploader>
 </template>
 
 <script lang="ts">
@@ -44,6 +44,7 @@ import usePwd from "./composition/pwd";
 import BreadCrumbsNavigate from "./components/BreadCrumbsNavigate.vue";
 import ToolBar from "./components/ToolBar.vue";
 import RowData from "./components/RowData.vue";
+import DropUploader from "./components/DropUploader.vue";
 
 import list from "./methods/list";
 import changeDir from "./methods/changeDir";
@@ -54,7 +55,7 @@ import uploadFiles from "./methods/upload";
 import optionConfig from "./config/options";
 
 export default defineComponent({
-  components: { BreadCrumbsNavigate, ToolBar, RowData },
+  components: { BreadCrumbsNavigate, ToolBar, RowData, DropUploader },
   props: {
     type: {
       type: String,

@@ -1,5 +1,5 @@
 <template>
-  <div class="row">
+  <div class="row q-pa-md full-width">
     <file-manager :type="type" :id="id" />
   </div>
 </template>

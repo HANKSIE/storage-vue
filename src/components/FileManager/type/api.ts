@@ -19,7 +19,7 @@ import RemoveData from "./request/RemoveData";
 // fetch/axios response
 type Response<T> = Promise<AxiosResponse<T>>;
 
-type Api = {
+interface Api {
     list(data: ListData): Response<ListResponse>
     mkdir(data: MakeDirData): Response<MakeDirResponse>
     remove(data: RemoveData): Response<RemoveResponse>

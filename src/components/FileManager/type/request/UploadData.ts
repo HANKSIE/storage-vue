@@ -1,6 +1,4 @@
-import BaseData from "./BaseData";
-
-type UploadData = BaseData & {
+type UploadData = {
     dir: string
     filePaths: string[]
     files: File[]

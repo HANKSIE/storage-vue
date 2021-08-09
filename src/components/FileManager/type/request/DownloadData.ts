@@ -1,6 +1,4 @@
-import BaseData from "./BaseData";
-
-type DownloadData = BaseData & {
+type DownloadData = {
     dir: string
     filenames: string[]
 }

@@ -8,10 +8,7 @@
     <q-item clickable class="q-mt-xl">
       <q-item-section>
         <!-- breadcrumbs -->
-        <breadcrumbs-path-link
-          :nodes="pwdBreadcrumbNodes"
-          @changeDir="cdBreadcrumbs"
-        />
+        <breadcrumbs-path-link :nodes="pwdBreadcrumbNodes" @changeDir="cd" />
       </q-item-section>
     </q-item>
     <q-item clickable v-ripple v-for="(fileInfo, i) in fileInfos" :key="i">
@@ -27,7 +24,7 @@
             <link-text
               class="ellipsis"
               style="width: 100px"
-              @click="cd(fileInfo.name)"
+              @click="cdLink(fileInfo.name)"
             >
               {{ fileInfo.name }}
             </link-text>
@@ -66,10 +63,9 @@
   </q-list>
 </template>
 <script lang="ts">
-import { defineComponent, onMounted, ref, toRefs } from "vue";
+import { defineComponent, onMounted, PropType, ref } from "vue";
 import usePwd from "../../composition/pwd";
-import list from "../../methods/list";
-import changeDir from "../../methods/changeDir";
+
 import useFileInfos from "../../composition/fileInfos";
 import optionConfig from "../../config/options";
 import getMimeIcon from "../../utils/getMimeIcon";
@@ -78,17 +74,14 @@ import LinkText from "../LinkText.vue";
 import BreadcrumbsPathLink from "../BreadcrumbsPathLink.vue";
 import PathHelper from "../../utils/path";
 
+import Api from "../../type/api";
+
 export default defineComponent({
   components: { LinkText, BreadcrumbsPathLink },
-  emits: ["mkdir", "handle"],
+  emits: ["handle"],
   props: {
-    type: {
-      type: String,
-      require: true,
-    },
-    id: {
-      type: Number,
-      require: true,
+    api: {
+      type: Object as PropType<Api>,
     },
     actionText: {
       type: String,
@@ -96,42 +89,63 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
-    const { type, id } = toRefs(props);
+    const api = props.api as Api;
+
     const dirname = ref<string>("");
-    const { pwd, pwdStr, pwdBreadcrumbNodes } = usePwd();
-    const { fileInfos } = useFileInfos();
-    const mkdir = () => {
-      emit("mkdir", dirname.value);
-      dirname.value = "";
+    const { pwdStr, pwdBreadcrumbNodes, setPwdByPath } = usePwd();
+    const { fileInfos, setFileInfos, addFileInfos } = useFileInfos();
+
+    const mkdir = async (): Promise<void> => {
+      try {
+        const res = await api.mkdir({
+          dir: pwdStr.value,
+          filename: dirname.value,
+        });
+        const { fileInfo, isSuccess, exist } = res.data;
+
+        if (fileInfo) {
+          addFileInfos([fileInfo]);
+        } else if (!isSuccess) {
+          console.log("創建失敗");
+        } else if (exist) {
+          console.log("檔案已存在: ", exist);
+        }
+      } catch (err) {
+        console.error(err);
+      }
     };
+
     const handle = () => emit("handle", pwdStr.value);
 
     onMounted(() => {
-      list(fileInfos, {
-        type: type.value!,
-        id: id.value!,
-        dir: pwdStr.value,
-        options: optionConfig.LIST_DIR_ONLY,
-      });
+      list(pwdStr.value);
     });
 
-    const cdBreadcrumbs = (dir: string): void => {
-      changeDir(pwd, fileInfos, {
-        type: type.value!,
-        id: id.value!,
-        dir,
-        options: optionConfig.LIST_DIR_ONLY,
-      });
+    const list = async (dir: string): Promise<void> => {
+      try {
+        const res = await api.list({
+          dir,
+          options: optionConfig.LIST_DIR_ONLY,
+        });
+        const { fileInfos } = res.data;
+        setFileInfos(fileInfos);
+      } catch (err) {
+        console.error(err);
+      }
     };
 
-    const cd = (dirname: string): void => {
-      const dir = PathHelper.concat(pwdStr.value!, dirname);
-      changeDir(pwd, fileInfos, {
-        type: type.value!,
-        id: id.value!,
-        dir,
-        options: optionConfig.LIST_DIR_ONLY,
-      });
+    const cd = async (dir: string): Promise<void> => {
+      try {
+        await list(dir);
+        setPwdByPath(dir);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    const cdLink = (dirname: string): void => {
+      const dir = PathHelper.concat(pwdStr.value, dirname);
+      cd(dir);
     };
 
     return {
@@ -140,7 +154,7 @@ export default defineComponent({
       dirname,
       mkdir,
       cd,
-      cdBreadcrumbs,
+      cdLink,
       handle,
       getMimeIcon,
     };

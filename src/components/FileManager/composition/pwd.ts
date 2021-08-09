@@ -1,11 +1,7 @@
 import PathHelper from "@/components/FileManager/utils/path";
-import { ref, Ref, computed, ComputedRef } from "vue";
+import { ref, computed, ComputedRef } from "vue";
 
 type Pwd = string[];
-
-type PwdRef = Ref<Pwd>;
-
-type PwdStrRef = ComputedRef<string>;
 
 type PwdBreadCrumbNode = {
     text: string;
@@ -13,10 +9,10 @@ type PwdBreadCrumbNode = {
 }
 
 const usePwd = () => {
-    const pwd: PwdRef = ref<Pwd>([]);
-    const pwdStr: PwdStrRef = computed(() => "/" + pwd.value.join("/") + (pwd.value.length > 0 ? "/": ""));
+    const pwd = ref<Pwd>([]);
+    const pwdStr = computed(() => "/" + pwd.value.join("/") + (pwd.value.length > 0 ? "/": ""));
     
-    const setPwdByPath = (pwd: PwdRef, path: string) => {
+    const setPwdByPath = (path: string) => {
         path = PathHelper.format(path);
         pwd.value = path.split("/").filter((el) => !!el);
     }
@@ -47,4 +43,4 @@ const usePwd = () => {
 
 export default usePwd;
 
-export { Pwd, PwdRef, PwdStrRef, PwdBreadCrumbNode }
+export { Pwd, PwdBreadCrumbNode }

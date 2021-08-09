@@ -43,11 +43,9 @@
     bordered
   >
     <destination-chooser
-      :type="type"
-      :id="id"
+      :api="api"
       :actionText="destChooser.text"
       @handle="destChooser.handle"
-      @mkdir="mkdir"
     />
   </q-drawer>
 </template>
@@ -56,8 +54,8 @@
 import {
   defineComponent,
   onMounted,
+  PropType,
   reactive,
-  toRefs,
 } from "@vue/runtime-core";
 import { columns } from "./config/widget";
 import useFileInfos from "./composition/fileInfos";
@@ -71,14 +69,8 @@ import RowData from "./components/RowData.vue";
 import DropUploader from "./components/DropUploader.vue";
 import DestinationChooser from "./components/chooser/DestinationChooser.vue";
 
-import list from "./methods/list";
-import changeDir from "./methods/changeDir";
-import remove from "./methods/remove";
-import makedir from "./methods/makedir";
-import uploadFiles from "./methods/upload";
-import downloadFiles from "./methods/download";
-
 import optionConfig from "./config/options";
+import Api from "./type/api";
 
 export default defineComponent({
   components: {
@@ -89,20 +81,16 @@ export default defineComponent({
     DestinationChooser,
   },
   props: {
-    type: {
-      type: String,
-      require: true,
-    },
-    id: {
-      type: Number,
-      require: true,
+    api: {
+      type: Object as PropType<Api>,
     },
   },
   setup(props) {
-    const { type, id } = toRefs(props);
-    const { fileInfos } = useFileInfos();
-    const { selected } = useSelected();
-    const { pwd, pwdStr, pwdBreadcrumbNodes } = usePwd();
+    const api = props.api as Api;
+    const { fileInfos, setFileInfos, removeFileInfos, addFileInfos } =
+      useFileInfos();
+    const { selected, clearSelected } = useSelected();
+    const { pwdStr, pwdBreadcrumbNodes, setPwdByPath } = usePwd();
     const destChooser = reactive({
       toggle: false,
       text: "",
@@ -112,59 +100,106 @@ export default defineComponent({
     });
 
     onMounted(() => {
-      list(fileInfos, {
-        type: type.value!,
-        id: id.value!,
-        dir: pwdStr.value,
-        options: optionConfig.LIST_ALL,
-      });
+      list(pwdStr.value);
     });
 
-    const cd = (dir: string): void => {
-      changeDir(pwd, fileInfos, {
-        type: type.value!,
-        id: id.value!,
-        dir,
-        options: optionConfig.LIST_ALL,
-      });
+    const list = async (dir: string): Promise<void> => {
+      try {
+        const res = await api.list({
+          dir,
+          options: optionConfig.LIST_ALL,
+        });
+        const { fileInfos } = res.data;
+        setFileInfos(fileInfos);
+      } catch (err) {
+        console.error(err);
+      }
     };
 
-    const rm = (): void => {
-      remove(fileInfos, selected, {
-        type: type.value!,
-        id: id.value!,
-        dir: pwdStr.value,
-        filenames: selected.value.map((info) => info.name),
-      });
+    const cd = async (dir: string): Promise<void> => {
+      try {
+        await list(dir);
+        setPwdByPath(dir);
+      } catch (err) {
+        console.error(err);
+      }
     };
 
-    const mkdir = (filename: string): void => {
-      makedir(fileInfos, {
-        type: type.value!,
-        id: id.value!,
-        dir: pwdStr.value,
-        filename,
-      });
+    const rm = async (): Promise<void> => {
+      try {
+        const res = await api.remove({
+          dir: pwdStr.value,
+          filenames: selected.value.map((info) => info.name),
+        });
+        const { successes } = res.data;
+
+        removeFileInfos(successes);
+
+        clearSelected();
+      } catch (err) {
+        console.error(err);
+      }
     };
 
-    const download = (): void => {
-      downloadFiles(selected, {
-        type: type.value!,
-        id: id.value!,
-        dir: pwdStr.value,
-        filenames: selected.value.map((info) => info.name),
-      });
+    const mkdir = async (filename: string): Promise<void> => {
+      try {
+        const res = await api.mkdir({
+          dir: pwdStr.value,
+          filename,
+        });
+        const { fileInfo, isSuccess, exist } = res.data;
+
+        if (fileInfo) {
+          addFileInfos([fileInfo]);
+        } else if (!isSuccess) {
+          console.log("創建失敗");
+        } else if (exist) {
+          console.log("檔案已存在: ", exist);
+        }
+      } catch (err) {
+        console.error(err);
+      }
     };
 
-    const upload = (filePaths: string[], files: File[]): void => {
-      uploadFiles(fileInfos, {
-        type: type.value!,
-        id: id.value!,
-        dir: pwdStr.value,
-        filePaths,
-        files,
-        options: optionConfig.OVERRIDE_NONE,
-      });
+    const download = async (): Promise<void> => {
+      try {
+        const res = await api.download({
+          dir: pwdStr.value,
+          filenames: selected.value.map((info) => info.name),
+        });
+        const a = document.createElement("a");
+        const url = window.URL.createObjectURL(res.data);
+        a.href = url;
+        const contentDisposition = res.headers["content-disposition"];
+        const filename = contentDisposition.match(/filename=(.+)/)[1];
+        a.download = decodeURIComponent(filename);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        clearSelected();
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    const upload = async (
+      filePaths: string[],
+      files: File[]
+    ): Promise<void> => {
+      try {
+        const res = await api.upload({
+          dir: pwdStr.value,
+          filePaths,
+          files,
+          options: optionConfig.OVERRIDE_NONE,
+        });
+        const { fileInfos } = res.data;
+
+        addFileInfos(fileInfos);
+
+        //TODO add exists to progressGroups
+      } catch (err) {
+        console.error(err);
+      }
     };
 
     const move = (): void => {

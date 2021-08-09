@@ -1,6 +1,4 @@
-import BaseData from "./BaseData"
-
-type CopyMoveData = BaseData & {
+type CopyMoveData = {
     fromDir: string
     toDir: string
     filenames: string[]

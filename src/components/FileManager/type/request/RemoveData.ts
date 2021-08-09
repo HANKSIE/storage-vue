@@ -1,6 +1,4 @@
-import BaseData from "./BaseData";
-
-type RemoveData = BaseData & {
+type RemoveData = {
     dir: string
     filenames: string[]
 }

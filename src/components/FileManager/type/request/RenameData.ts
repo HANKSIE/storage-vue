@@ -1,6 +1,4 @@
-import BaseData from "./BaseData";
-
-type RenameData = BaseData & {
+type RenameData = {
     dir: string
     oldFileName: string
     newFileName: string

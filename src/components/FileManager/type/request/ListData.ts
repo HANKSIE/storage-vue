@@ -1,6 +1,4 @@
-import BaseData from "./BaseData";
-
-type ListData = BaseData & {
+type ListData = {
     dir: string
     options: number
 }

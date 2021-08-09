@@ -1,6 +1,4 @@
-import BaseData from "./BaseData";
-
-type MakeDirData = BaseData & {
+type MakeDirData = {
     dir: string
     filename: string
 }

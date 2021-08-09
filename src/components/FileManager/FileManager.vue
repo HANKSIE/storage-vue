@@ -18,6 +18,7 @@
               @remove="rm"
               @mkdir="mkdir"
               @upload="upload"
+              @download="download"
             />
             <!-- 麵包屑導航 -->
             <bread-crumbs-navigate
@@ -51,6 +52,7 @@ import changeDir from "./methods/changeDir";
 import remove from "./methods/remove";
 import makedir from "./methods/makedir";
 import uploadFiles from "./methods/upload";
+import downloadFiles from "./methods/download";
 
 import optionConfig from "./config/options";
 
@@ -108,6 +110,15 @@ export default defineComponent({
       });
     };
 
+    const download = (): void => {
+      downloadFiles(selected, {
+        type: type.value!,
+        id: id.value!,
+        dir: pwdStr.value,
+        filenames: selected.value.map((info) => info.name),
+      });
+    };
+
     const upload = (filePaths: string[], files: File[]): void => {
       uploadFiles(fileInfos, {
         type: type.value!,
@@ -129,6 +140,7 @@ export default defineComponent({
       rm,
       mkdir,
       upload,
+      download,
     };
   },
 });

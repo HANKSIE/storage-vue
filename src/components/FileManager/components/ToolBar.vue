@@ -30,7 +30,7 @@
     </template>
     <template v-if="selectedFileInfos.length > 0">
       <!-- 下載 -->
-      <q-btn flat label="下載" icon="download" />
+      <q-btn flat label="下載" icon="download" @click="download" />
       <!-- 刪除 -->
       <q-btn flat label="刪除" icon="delete" @click="openRemoveDialog" />
       <!-- 移動 -->
@@ -92,6 +92,7 @@ export default defineComponent({
     const upload = (filePaths: string[], files: File[]): void =>
       emit("upload", filePaths, files);
     const rename = (filename: string): void => emit("rename", filename);
+    const download = (): void => emit("download");
 
     const remove = (): void => emit("remove");
 
@@ -104,6 +105,7 @@ export default defineComponent({
       upload,
       rename,
       remove,
+      download,
     };
   },
 });

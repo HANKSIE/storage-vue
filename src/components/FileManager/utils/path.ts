@@ -14,9 +14,16 @@ export default class PathHelper {
         return name.includes(".") ? name.split(".").reverse()[0] : "";
     }
   
-    static basename(path: string){
+    static basename(path: string, withExt = true){
         path = PathHelper.format(path);
-        return path.split("/").reverse()[0];
+        const basename = path.split("/").reverse()[0];
+        if(!withExt){
+            const ext = PathHelper.extension(basename);
+            const lastPos  = basename.lastIndexOf(ext);
+            return basename.substring(0, lastPos-1);
+        }else{
+            return basename;
+        }
     }
 
     static rootFileName(path: string) {

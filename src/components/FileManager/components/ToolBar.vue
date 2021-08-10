@@ -57,13 +57,14 @@
   </q-toolbar>
 </template>
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+import { defineComponent, nextTick, PropType } from "vue";
 import { Selected } from "../composition/selected";
 import Uploader from "./Uploader.vue";
 import MkdirDialog from "./dialog/Mkdir.vue";
 import RenameDialog from "./dialog/Rename.vue";
 import RemoveDialog from "./dialog/Remove.vue";
 import { useQuasar } from "quasar";
+import PathHelper from "../utils/path";
 
 export default defineComponent({
   components: { Uploader },
@@ -99,11 +100,18 @@ export default defineComponent({
     };
 
     const openRenameDialog = (): void => {
-      $q.dialog({
-        component: RenameDialog,
-      }).onOk((filename: string) => {
-        rename(filename);
-      });
+      if (props.selected) {
+        const ext = PathHelper.extension(props.selected[0].name);
+
+        $q.dialog({
+          component: RenameDialog,
+          componentProps: {
+            ext,
+          },
+        }).onOk((filename: string) => {
+          rename(filename);
+        });
+      }
     };
 
     const openRemoveDialog = (): void => {

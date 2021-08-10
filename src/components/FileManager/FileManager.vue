@@ -19,6 +19,7 @@
               :progressGroups="progressSideBar.groups"
               @remove="rm"
               @mkdir="mkdir"
+              @rename="rename"
               @upload="upload"
               @download="download"
               @openDestChooserMove="openDestChooserMove"
@@ -129,6 +130,7 @@ export default defineComponent({
       removeFileInfos,
       addFileInfos,
       getFileInfos,
+      replaceFileInfo,
     } = useFileInfos();
     const { selected, clearSelected } = useSelected();
     const { pwdStr, pwdBreadcrumbNodes, setPwdByPath } = usePwd();
@@ -203,6 +205,24 @@ export default defineComponent({
           console.log("創建失敗");
         } else if (exist) {
           console.log("檔案已存在: ", exist);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    const rename = async (newFileName: string): Promise<void> => {
+      try {
+        const oldFileName = selected.value[0].name;
+        const res = await api.rename({
+          dir: pwdStr.value,
+          oldFileName,
+          newFileName,
+        });
+
+        const { fileInfo } = res.data;
+        if (fileInfo) {
+          replaceFileInfo(oldFileName, fileInfo);
         }
       } catch (err) {
         console.error(err);
@@ -399,6 +419,7 @@ export default defineComponent({
       cd,
       rm,
       mkdir,
+      rename,
       upload,
       download,
       mkdirHook,

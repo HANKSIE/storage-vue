@@ -15,12 +15,14 @@
             <!-- 工具列 -->
             <tool-bar
               :selected="selected"
+              :progressGroups="progressSideBar.groups"
               @remove="rm"
               @mkdir="mkdir"
               @upload="upload"
               @download="download"
               @openDestChooserMove="openDestChooserMove"
               @openDestChooserCopy="openDestChooserCopy"
+              @openProgressSideBar="openProgressSideBar"
             />
             <!-- 麵包屑導航 -->
             <breadcrumbs-path-link
@@ -45,9 +47,19 @@
     <destination-chooser
       :api="api"
       :actionText="destChooser.text"
+      :toggle="destChooser.toggle"
       @handle="destChooser.handle"
       @mkdirHook="mkdirHook"
     />
+  </q-drawer>
+  <q-drawer
+    v-model="progressSideBar.toggle"
+    behavior="mobile"
+    overlay
+    side="right"
+    bordered
+  >
+    <progress-bar :groups="progressSideBar.groups" @removeGroup="removeGroup" />
   </q-drawer>
 </template>
 
@@ -69,10 +81,17 @@ import ToolBar from "./components/ToolBar.vue";
 import RowData from "./components/RowData.vue";
 import DropUploader from "./components/DropUploader.vue";
 import DestinationChooser from "./components/chooser/DestinationChooser.vue";
+import ProgressBar from "./components/ProgressBar.vue";
 
 import optionConfig from "./config/options";
 import Api from "./type/api";
 import FileInfo from "./type/fileInfo";
+import CopyMoveRecord from "./type/ProgressRecord/CopyMove/ExistRecord";
+import SelfRecord from "./type/ProgressRecord/CopyMove/SelfRecord";
+import CopyMoveRecordGroup, {
+  KeepBothRelaceFunc as CopyMoveFunc,
+} from "./type/ProgressRecord/CopyMove/RecordGroup";
+import ExistRecord from "./type/ProgressRecord/CopyMove/ExistRecord";
 
 type DestChooserHandle = (toDir: string) => Promise<void>;
 
@@ -82,6 +101,11 @@ type DestChooserProps = {
   handle: DestChooserHandle | null;
 };
 
+type ProgressSideBarProps = {
+  toggle: boolean;
+  groups: CopyMoveRecordGroup[];
+};
+
 export default defineComponent({
   components: {
     BreadcrumbsPathLink,
@@ -89,6 +113,7 @@ export default defineComponent({
     RowData,
     DropUploader,
     DestinationChooser,
+    ProgressBar,
   },
   props: {
     api: {
@@ -97,8 +122,13 @@ export default defineComponent({
   },
   setup(props) {
     const api = props.api as Api;
-    const { fileInfos, setFileInfos, removeFileInfos, addFileInfos } =
-      useFileInfos();
+    const {
+      fileInfos,
+      setFileInfos,
+      removeFileInfos,
+      addFileInfos,
+      getFileInfos,
+    } = useFileInfos();
     const { selected, clearSelected } = useSelected();
     const { pwdStr, pwdBreadcrumbNodes, setPwdByPath } = usePwd();
 
@@ -107,6 +137,11 @@ export default defineComponent({
       text: "",
       handle: null,
     };
+
+    const progressSideBar: ProgressSideBarProps = reactive({
+      toggle: false,
+      groups: [],
+    });
 
     const destChooser = reactive(destChooserProps);
 
@@ -220,49 +255,109 @@ export default defineComponent({
       }
     };
 
-    const move: DestChooserHandle = async (toDir: string): Promise<void> => {
-      try {
-        const fromDir = pwdStr.value;
-        const res = await api.move({
-          fromDir,
-          toDir,
-          filenames: selected.value.map((info) => info.name),
-          options: optionConfig.OVERRIDE_NONE,
-        });
+    const copyMove =
+      (isCopy: boolean) =>
+      async (toDir: string): Promise<void> => {
+        try {
+          const fromDir = pwdStr.value;
+          const payload = {
+            fromDir,
+            toDir,
+            filenames: selected.value.map((info) => info.name),
+            options: optionConfig.OVERRIDE_NONE,
+          };
+          const res = await (isCopy ? api.copy(payload) : api.move(payload));
 
-        const { fileInfos } = res.data;
+          const { fileInfos, exists, selfs } = res.data;
 
-        if (fromDir !== toDir) {
-          removeFileInfos(fileInfos.map((info) => info.name));
+          if (fromDir === toDir && isCopy) {
+            addFileInfos(fileInfos);
+          }
+
+          if (fromDir !== toDir && !isCopy) {
+            removeFileInfos(fileInfos.map((info) => info.name));
+          }
+
+          if (exists.length > 0 || selfs.length > 0) {
+            const existFileInfos = getFileInfos(exists);
+            const selfFileInfos = getFileInfos(selfs);
+
+            const existRecords: CopyMoveRecord[] = existFileInfos.map(
+              (info) => ({
+                fromDir,
+                toDir,
+                fileInfo: info,
+              })
+            );
+
+            const selfRecords: SelfRecord[] = selfFileInfos.map((info) => ({
+              fileInfo: info,
+            }));
+
+            const group = new CopyMoveRecordGroup(
+              isCopy ? "copy" : "move",
+              existRecords,
+              selfRecords,
+              copyMoveKeepBothReplace(isCopy, true),
+              copyMoveKeepBothReplace(isCopy, false)
+            );
+
+            progressSideBar.groups.push(group);
+          }
+          clearSelected();
+          destChooser.toggle = false;
+        } catch (err) {
+          console.error(err);
         }
+      };
 
-        clearSelected();
-        destChooser.toggle = false;
-      } catch (err) {
-        console.error(err);
-      }
-    };
+    const copyMoveKeepBothReplace =
+      (isCopy: boolean, isKeepBoth: boolean): CopyMoveFunc =>
+      async (
+        group: CopyMoveRecordGroup,
+        record: ExistRecord | SelfRecord,
+        fromDir: string,
+        toDir: string,
+        filename: string
+      ) => {
+        try {
+          const payload = {
+            fromDir,
+            toDir,
+            filenames: [filename],
+            options: isKeepBoth
+              ? optionConfig.OVERRIDE_KEEPBOTH
+              : optionConfig.OVERRIDE_REPLACE,
+          };
+          const res = await (isCopy ? api.copy(payload) : api.move(payload));
 
-    const copy: DestChooserHandle = async (toDir: string): Promise<void> => {
-      try {
-        const fromDir = pwdStr.value;
-        const res = await api.copy({
-          fromDir,
-          toDir,
-          filenames: selected.value.map((info) => info.name),
-          options: optionConfig.OVERRIDE_NONE,
-        });
+          const { fileInfos } = res.data;
 
-        const { fileInfos } = res.data;
-        if (fromDir === toDir) {
-          addFileInfos(fileInfos);
+          if (pwdStr.value === toDir) {
+            //replace
+            if (!isKeepBoth) {
+              removeFileInfos(fileInfos.map((info) => info.name));
+            }
+            //keepBoth & replace
+            addFileInfos(fileInfos);
+          }
+
+          group.existRecords = group.existRecords.filter((r) => r !== record);
+          const { existRecords, selfRecords } = group;
+          //record count is 0
+          if (existRecords.length + selfRecords.length === 0) {
+            //remove group
+            progressSideBar.groups = progressSideBar.groups.filter(
+              (g) => g !== group
+            );
+          }
+        } catch (err) {
+          console.error(err);
         }
-        clearSelected();
-        destChooser.toggle = false;
-      } catch (err) {
-        console.error(err);
-      }
-    };
+      };
+
+    const move: DestChooserHandle = copyMove(false);
+    const copy: DestChooserHandle = copyMove(true);
 
     const mkdirHook = (chooserPwdStr: string, info: FileInfo): void => {
       if (chooserPwdStr === pwdStr.value) {
@@ -282,6 +377,16 @@ export default defineComponent({
       destChooser.toggle = true;
     };
 
+    const openProgressSideBar = () => {
+      progressSideBar.toggle = true;
+    };
+
+    const removeGroup = (group: CopyMoveRecordGroup) => {
+      progressSideBar.groups = progressSideBar.groups.filter(
+        (g) => g !== group
+      );
+    };
+
     return {
       columns,
       fileInfos,
@@ -289,6 +394,7 @@ export default defineComponent({
       pwdBreadcrumbNodes,
       pwdStr,
       destChooser,
+      progressSideBar,
       cd,
       rm,
       mkdir,
@@ -297,6 +403,8 @@ export default defineComponent({
       mkdirHook,
       openDestChooserMove,
       openDestChooserCopy,
+      openProgressSideBar,
+      removeGroup,
     };
   },
 });

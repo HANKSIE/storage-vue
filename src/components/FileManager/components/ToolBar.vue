@@ -19,14 +19,10 @@
         </q-list>
       </q-btn-dropdown>
     </template>
-    <template v-if="selected.length === 1">
-      <!-- 重新命名 -->
-      <q-btn
-        flat
-        label="重新命名"
-        icon="drive_file_rename_outline"
-        @click="openRenameDialog"
-      />
+    <template v-if="progressGroups.length > 0">
+      <q-btn flat icon="error" @click="openProgressSideBar">
+        <q-badge floating color="red" rounded />
+      </q-btn>
     </template>
     <template v-if="selected.length > 0">
       <!-- 下載 -->
@@ -42,6 +38,15 @@
       />
       <!-- 複製 -->
       <q-btn flat label="複製" icon="file_copy" @click="openDestChooserCopy" />
+    </template>
+    <template v-if="selected.length === 1">
+      <!-- 重新命名 -->
+      <q-btn
+        flat
+        label="重新命名"
+        icon="drive_file_rename_outline"
+        @click="openRenameDialog"
+      />
     </template>
   </q-toolbar>
 </template>
@@ -64,10 +69,15 @@ export default defineComponent({
     "remove",
     "openDestChooserMove",
     "openDestChooserCopy",
+    "openProgressSideBar",
   ],
   props: {
     selected: {
       type: Object as PropType<Selected>,
+      require: true,
+    },
+    progressGroups: {
+      type: Array,
       require: true,
     },
   },
@@ -100,6 +110,7 @@ export default defineComponent({
 
     const openDestChooserMove = (): void => emit("openDestChooserMove");
     const openDestChooserCopy = (): void => emit("openDestChooserCopy");
+    const openProgressSideBar = (): void => emit("openProgressSideBar");
 
     const mkdir = (dirname: string): void => emit("mkdir", dirname);
     const upload = (filePaths: string[], files: File[]): void =>
@@ -120,6 +131,7 @@ export default defineComponent({
       download,
       openDestChooserMove,
       openDestChooserCopy,
+      openProgressSideBar,
     };
   },
 });

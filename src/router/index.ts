@@ -8,7 +8,6 @@ import FileManager from "@/views/Dashboard/FileManager.vue";
 import Setting from "@/views/Dashboard/Setting.vue";
 
 import authApi from "@/utils/api/auth";
-import { AxiosError } from "axios";
 import apiToken from "@/utils/token/apiToken";
 import { useStore } from "@/store";
 

@@ -7,6 +7,9 @@ const useFileInfos = () => {
     const setFileInfos = (infos: FileInfo[]): void => {
         fileInfos.value = infos;
     }
+    const getFileInfos = (names: string[]): FileInfo[] => {
+        return fileInfos.value.filter(info => names.includes(info.name))
+    }
     const removeFileInfos = (filenames: string[]): void => {
         fileInfos.value = fileInfos.value.filter((info) => !filenames.includes(info.name));
     }
@@ -21,6 +24,7 @@ const useFileInfos = () => {
     return {
         fileInfos,
         setFileInfos,
+        getFileInfos,
         removeFileInfos,
         addFileInfos,
         replaceFileInfo

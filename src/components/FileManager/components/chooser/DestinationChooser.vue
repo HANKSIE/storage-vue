@@ -63,7 +63,7 @@
   </q-list>
 </template>
 <script lang="ts">
-import { defineComponent, onMounted, PropType, ref } from "vue";
+import { defineComponent, onMounted, PropType, ref, watchEffect } from "vue";
 import usePwd from "../../composition/pwd";
 
 import useFileInfos from "../../composition/fileInfos";
@@ -86,6 +86,10 @@ export default defineComponent({
     actionText: {
       type: String,
       default: "123",
+    },
+    toggle: {
+      type: Boolean,
+      default: false,
     },
   },
   setup(props, { emit }) {
@@ -148,6 +152,13 @@ export default defineComponent({
       const dir = PathHelper.concat(pwdStr.value, dirname);
       cd(dir);
     };
+
+    watchEffect(() => {
+      if (!props.toggle) {
+        setPwdByPath("");
+        list(pwdStr.value);
+      }
+    });
 
     return {
       fileInfos,

@@ -74,6 +74,14 @@ import optionConfig from "./config/options";
 import Api from "./type/api";
 import FileInfo from "./type/fileInfo";
 
+type DestChooserHandle = (toDir: string) => Promise<void>;
+
+type DestChooserProps = {
+  toggle: boolean;
+  text: string;
+  handle: DestChooserHandle | null;
+};
+
 export default defineComponent({
   components: {
     BreadcrumbsPathLink,
@@ -93,13 +101,14 @@ export default defineComponent({
       useFileInfos();
     const { selected, clearSelected } = useSelected();
     const { pwdStr, pwdBreadcrumbNodes, setPwdByPath } = usePwd();
-    const destChooser = reactive({
+
+    const destChooserProps: DestChooserProps = {
       toggle: false,
       text: "",
-      handle: (): void => {
-        //
-      },
-    });
+      handle: null,
+    };
+
+    const destChooser = reactive(destChooserProps);
 
     onMounted(() => {
       list(pwdStr.value);
@@ -211,12 +220,48 @@ export default defineComponent({
       }
     };
 
-    const move = (): void => {
-      //
+    const move: DestChooserHandle = async (toDir: string): Promise<void> => {
+      try {
+        const fromDir = pwdStr.value;
+        const res = await api.move({
+          fromDir,
+          toDir,
+          filenames: selected.value.map((info) => info.name),
+          options: optionConfig.OVERRIDE_NONE,
+        });
+
+        const { fileInfos } = res.data;
+
+        if (fromDir !== toDir) {
+          removeFileInfos(fileInfos.map((info) => info.name));
+        }
+
+        clearSelected();
+        destChooser.toggle = false;
+      } catch (err) {
+        console.error(err);
+      }
     };
 
-    const copy = (): void => {
-      //
+    const copy: DestChooserHandle = async (toDir: string): Promise<void> => {
+      try {
+        const fromDir = pwdStr.value;
+        const res = await api.copy({
+          fromDir,
+          toDir,
+          filenames: selected.value.map((info) => info.name),
+          options: optionConfig.OVERRIDE_NONE,
+        });
+
+        const { fileInfos } = res.data;
+        if (fromDir === toDir) {
+          addFileInfos(fileInfos);
+        }
+        clearSelected();
+        destChooser.toggle = false;
+      } catch (err) {
+        console.error(err);
+      }
     };
 
     const mkdirHook = (chooserPwdStr: string, info: FileInfo): void => {

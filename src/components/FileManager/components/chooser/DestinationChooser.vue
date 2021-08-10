@@ -63,7 +63,7 @@
   </q-list>
 </template>
 <script lang="ts">
-import { defineComponent, onMounted, PropType, ref, watchEffect } from "vue";
+import { defineComponent, PropType, ref, watchEffect } from "vue";
 import usePwd from "../../composition/pwd";
 
 import useFileInfos from "../../composition/fileInfos";
@@ -122,10 +122,6 @@ export default defineComponent({
 
     const handle = () => emit("handle", pwdStr.value);
 
-    onMounted(() => {
-      list(pwdStr.value);
-    });
-
     const list = async (dir: string): Promise<void> => {
       try {
         const res = await api.list({
@@ -156,6 +152,8 @@ export default defineComponent({
     watchEffect(() => {
       if (!props.toggle) {
         setPwdByPath("");
+        list(pwdStr.value);
+      } else {
         list(pwdStr.value);
       }
     });

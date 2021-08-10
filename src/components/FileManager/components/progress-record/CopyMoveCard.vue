@@ -10,7 +10,7 @@
     </div>
   </div>
 
-  <div v-for="(record, i) in group.existRecords" :key="i">
+  <div v-for="(record, i) in group.existRecords" :key="i" class="q-mb-lg">
     <div class="row justify-start full-width no-wrap">
       <q-img
         :src="getMimeIcon(record.fileInfo.mime)"
@@ -33,7 +33,7 @@
     </div>
   </div>
 
-  <div v-for="(record, i) in group.selfRecords" :key="i">
+  <div v-for="(record, i) in group.selfRecords" :key="i" class="q-mb-lg">
     <div class="row justify-start full-width no-wrap">
       <q-img
         :src="getMimeIcon(record.fileInfo.mime)"

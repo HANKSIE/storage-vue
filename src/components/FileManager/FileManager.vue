@@ -93,7 +93,13 @@ import SelfRecord from "./type/ProgressRecord/CopyMove/SelfRecord";
 import CopyMoveRecordGroup, {
   KeepBothRelaceFunc as CopyMoveFunc,
 } from "./type/ProgressRecord/CopyMove/RecordGroup";
+import UploadRecordGroup, {
+  KeepBothRelaceFunc as UploadFunc,
+} from "./type/ProgressRecord/Upload/RecordGroup";
 import ExistRecord from "./type/ProgressRecord/CopyMove/ExistRecord";
+import UploadRecord from "./type/ProgressRecord/Upload/UploadRecord";
+
+import getUploadRecords from "./utils/getUploadRecords";
 
 type DestChooserHandle = (toDir: string) => Promise<void>;
 
@@ -105,7 +111,7 @@ type DestChooserProps = {
 
 type ProgressSideBarProps = {
   toggle: boolean;
-  groups: CopyMoveRecordGroup[];
+  groups: (CopyMoveRecordGroup | UploadRecordGroup)[];
 };
 
 export default defineComponent({
@@ -260,21 +266,74 @@ export default defineComponent({
       files: File[]
     ): Promise<void> => {
       try {
+        const dir = pwdStr.value;
         const res = await api.upload({
-          dir: pwdStr.value,
+          dir,
           filePaths,
           files,
           options: optionConfig.OVERRIDE_NONE,
         });
-        const { fileInfos } = res.data;
+        const { fileInfos, exists } = res.data;
 
         addFileInfos(fileInfos);
 
-        //TODO add exists to progressGroups
+        if (exists.length > 0) {
+          const records = getUploadRecords(exists, dir, filePaths, files);
+          const group = new UploadRecordGroup(
+            "upload",
+            records,
+            uploadKeepBothReplace(true),
+            uploadKeepBothReplace(false)
+          );
+          progressSideBar.groups.unshift(group);
+        }
       } catch (err) {
         console.error(err);
       }
     };
+
+    const uploadKeepBothReplace =
+      (isKeepBoth: boolean): UploadFunc =>
+      async (
+        group: UploadRecordGroup,
+        record: UploadRecord,
+        dir: string,
+        filePaths: string[],
+        files: File[]
+      ) => {
+        try {
+          const res = await api.upload({
+            dir,
+            filePaths,
+            files,
+            options: isKeepBoth
+              ? optionConfig.OVERRIDE_KEEPBOTH
+              : optionConfig.OVERRIDE_REPLACE,
+          });
+          const { fileInfos } = res.data;
+
+          if (pwdStr.value === dir) {
+            //replace
+            if (!isKeepBoth) {
+              removeFileInfos(fileInfos.map((info) => info.name));
+            }
+            //keepBoth & replace
+            addFileInfos(fileInfos);
+          }
+
+          group.records = group.records.filter((r) => r !== record);
+          const { records } = group;
+          //record count is 0
+          if (records.length === 0) {
+            //remove group
+            progressSideBar.groups = progressSideBar.groups.filter(
+              (g) => g !== group
+            );
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      };
 
     const copyMove =
       (isCopy: boolean) =>
@@ -323,7 +382,7 @@ export default defineComponent({
               copyMoveKeepBothReplace(isCopy, false)
             );
 
-            progressSideBar.groups.push(group);
+            progressSideBar.groups.unshift(group);
           }
           clearSelected();
           destChooser.toggle = false;
@@ -352,7 +411,11 @@ export default defineComponent({
           };
           const res = await (isCopy ? api.copy(payload) : api.move(payload));
 
-          const { fileInfos } = res.data;
+          const { fileInfos, notExists } = res.data;
+
+          if (notExists.length > 0) {
+            console.log(notExists[0], "不存在");
+          }
 
           if (pwdStr.value === toDir) {
             //replace
@@ -402,7 +465,7 @@ export default defineComponent({
       progressSideBar.toggle = true;
     };
 
-    const removeGroup = (group: CopyMoveRecordGroup) => {
+    const removeGroup = (group: CopyMoveRecordGroup | UploadRecordGroup) => {
       progressSideBar.groups = progressSideBar.groups.filter(
         (g) => g !== group
       );

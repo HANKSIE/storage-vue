@@ -46,6 +46,7 @@
       :api="api"
       :actionText="destChooser.text"
       @handle="destChooser.handle"
+      @mkdirHook="mkdirHook"
     />
   </q-drawer>
 </template>
@@ -71,6 +72,7 @@ import DestinationChooser from "./components/chooser/DestinationChooser.vue";
 
 import optionConfig from "./config/options";
 import Api from "./type/api";
+import FileInfo from "./type/fileInfo";
 
 export default defineComponent({
   components: {
@@ -120,6 +122,7 @@ export default defineComponent({
       try {
         await list(dir);
         setPwdByPath(dir);
+        clearSelected();
       } catch (err) {
         console.error(err);
       }
@@ -216,6 +219,12 @@ export default defineComponent({
       //
     };
 
+    const mkdirHook = (chooserPwdStr: string, info: FileInfo): void => {
+      if (chooserPwdStr === pwdStr.value) {
+        addFileInfos([info]);
+      }
+    };
+
     const openDestChooserMove = () => {
       destChooser.text = "Move Here";
       destChooser.handle = move;
@@ -240,6 +249,7 @@ export default defineComponent({
       mkdir,
       upload,
       download,
+      mkdirHook,
       openDestChooserMove,
       openDestChooserCopy,
     };

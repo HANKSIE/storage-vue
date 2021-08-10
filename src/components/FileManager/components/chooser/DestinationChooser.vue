@@ -78,7 +78,7 @@ import Api from "../../type/api";
 
 export default defineComponent({
   components: { LinkText, BreadcrumbsPathLink },
-  emits: ["handle"],
+  emits: ["mkdirHook", "handle"],
   props: {
     api: {
       type: Object as PropType<Api>,
@@ -105,6 +105,7 @@ export default defineComponent({
 
         if (fileInfo) {
           addFileInfos([fileInfo]);
+          emit("mkdirHook", pwdStr.value, fileInfo);
         } else if (!isSuccess) {
           console.log("創建失敗");
         } else if (exist) {

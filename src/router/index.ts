@@ -75,7 +75,6 @@ router.beforeEach(async (to, from, next) => {
   }
 
   if (to.name == "login" && auth.state.user) {
-    console.log('已登入卻進入登入頁面')
     //有權限卻進入登入頁面
     return next({ name: "user_file" });
   }

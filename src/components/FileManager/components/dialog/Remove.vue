@@ -2,7 +2,7 @@
   <q-dialog ref="dialogRef" @hide="onDialogHide">
     <q-card class="q-dialog-plugin">
       <q-card-section class="row justify-center items-center">
-        <q-icon class="q-mr-sm" size="sm" name="delete" />
+        <q-icon class="q-mr-sm" size="sm" name="warning" />
         <span class="text-h6">確定刪除這些檔案?</span>
       </q-card-section>
 

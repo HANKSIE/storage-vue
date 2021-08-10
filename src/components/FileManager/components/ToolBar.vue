@@ -1,10 +1,16 @@
 <template>
   <q-toolbar class="q-gutter-sm">
     <!-- 新增資料夾 -->
-    <q-btn flat label="新增資料夾" icon="add" @click="openMkdirDialog" />
+    <q-btn
+      outline
+      flat
+      label="新增資料夾"
+      icon="add"
+      @click="openMkdirDialog"
+    />
     <template v-if="selected.length === 0">
       <!-- 上傳 -->
-      <q-btn-dropdown label="上傳" icon="upload">
+      <q-btn-dropdown label="上傳" icon="upload" flat>
         <q-list>
           <q-item clickable>
             <q-item-section>

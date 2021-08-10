@@ -14,6 +14,7 @@
           <template v-slot:top>
             <!-- 工具列 -->
             <tool-bar
+              class="q-mb-md"
               :selected="selected"
               :progressGroups="progressSideBar.groups"
               @remove="rm"

@@ -230,6 +230,7 @@ export default defineComponent({
         if (fileInfo) {
           replaceFileInfo(oldFileName, fileInfo);
         }
+        clearSelected();
       } catch (err) {
         console.error(err);
       }

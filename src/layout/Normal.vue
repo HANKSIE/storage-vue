@@ -1,8 +1,8 @@
 <template>
-  <q-layout>
-    <q-header class="glossy">
+  <q-layout view="lHh lpR fFf">
+    <q-header>
       <q-toolbar>
-        <q-toolbar-title> Storage </q-toolbar-title>
+        <q-toolbar-title> Storage Box </q-toolbar-title>
       </q-toolbar>
     </q-header>
 

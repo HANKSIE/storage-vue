@@ -34,7 +34,13 @@
     </q-item>
     <q-item class="q-mt-lg">
       <q-item-section>
-        <q-input dense label="資料夾名稱" outlined v-model="dirname">
+        <q-input
+          dense
+          label="資料夾名稱"
+          outlined
+          v-model="dirname"
+          :rules="[filenameRule]"
+        >
           <template v-slot:prepend>
             <q-icon name="create_new_folder" />
           </template>
@@ -76,6 +82,9 @@ import PathHelper from "../../utils/path";
 
 import Api from "../../type/api";
 
+import filenameRule from "../../validate/rules/filename";
+import validate from "../../validate/validate";
+
 export default defineComponent({
   components: { LinkText, BreadcrumbsPathLink },
   emits: ["mkdirHook", "handle"],
@@ -100,6 +109,10 @@ export default defineComponent({
     const { fileInfos, setFileInfos, addFileInfos } = useFileInfos();
 
     const mkdir = async (): Promise<void> => {
+      if (!validate(filenameRule(dirname.value))) {
+        return;
+      }
+
       try {
         const res = await api.mkdir({
           dir: pwdStr.value,
@@ -110,6 +123,7 @@ export default defineComponent({
         if (fileInfo) {
           addFileInfos([fileInfo]);
           emit("mkdirHook", pwdStr.value, fileInfo);
+          dirname.value = "";
         } else if (!isSuccess) {
           console.log("創建失敗");
         } else if (exist) {
@@ -167,6 +181,7 @@ export default defineComponent({
       cdLink,
       handle,
       getMimeIcon,
+      filenameRule,
     };
   },
 });

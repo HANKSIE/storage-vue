@@ -5,7 +5,12 @@
         <span class="text-h6">新增資料夾</span>
       </q-card-section>
       <q-card-section class="row justify-center items-center">
-        <q-input filled v-model="dirname" label="資料夾名稱">
+        <q-input
+          filled
+          v-model="dirname"
+          label="資料夾名稱"
+          :rules="[filenameRule]"
+        >
           <template v-slot:prepend>
             <q-icon name="create_new_folder" />
           </template>
@@ -22,6 +27,8 @@
 <script lang="ts">
 import { useDialogPluginComponent } from "quasar";
 import { defineComponent, ref } from "vue";
+import filenameRule from "../../validate/rules/filename";
+import validate from "../../validate/validate";
 
 export default defineComponent({
   emits: [...useDialogPluginComponent.emits],
@@ -32,8 +39,12 @@ export default defineComponent({
       useDialogPluginComponent();
 
     const onOKClick = (): void => {
-      onDialogOK(dirname.value);
-      dirname.value = "";
+      const dir = dirname.value;
+
+      if (validate(filenameRule(dir))) {
+        onDialogOK(dir);
+        dirname.value = "";
+      }
     };
 
     return {
@@ -42,6 +53,7 @@ export default defineComponent({
       onDialogHide,
       onOKClick,
       onCancelClick: onDialogCancel,
+      filenameRule,
     };
   },
 });

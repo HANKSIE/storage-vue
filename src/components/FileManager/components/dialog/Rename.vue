@@ -6,7 +6,12 @@
       </q-card-section>
       <q-card-section class="column justify-center items-center">
         <div>
-          <q-input filled v-model="filename" label="檔案名稱">
+          <q-input
+            filled
+            v-model="filename"
+            label="檔案名稱"
+            :rules="[filenameRule]"
+          >
             <template v-slot:prepend>
               <q-icon name="drive_file_rename_outline" />
             </template>
@@ -26,6 +31,8 @@
 <script lang="ts">
 import { useDialogPluginComponent } from "quasar";
 import { defineComponent, ref } from "vue";
+import filenameRule from "../../validate/rules/filename";
+import validate from "../../validate/validate";
 
 export default defineComponent({
   emits: [...useDialogPluginComponent.emits],
@@ -39,8 +46,12 @@ export default defineComponent({
       useDialogPluginComponent();
 
     const onOKClick = (): void => {
-      onDialogOK(`${filename.value}.${props.ext}`);
-      filename.value = "";
+      const name = filename.value;
+      if (validate(filenameRule(name))) {
+        const extension = props.ext ? "." + props.ext : "";
+        onDialogOK(`${filename.value}${extension}`);
+        filename.value = "";
+      }
     };
 
     return {
@@ -49,6 +60,7 @@ export default defineComponent({
       onDialogHide,
       onOKClick,
       onCancelClick: onDialogCancel,
+      filenameRule,
     };
   },
 });

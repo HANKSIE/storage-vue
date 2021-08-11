@@ -1,6 +1,6 @@
 <template>
-  <q-layout view="hHh lpR fFf">
-    <q-header class="glossy">
+  <q-layout view="lHh lpR fFf">
+    <q-header>
       <q-toolbar>
         <q-btn
           dense
@@ -9,14 +9,11 @@
           icon="menu"
           @click="drawerToggle = !drawerToggle"
         />
-        <q-toolbar-title> Storage Space </q-toolbar-title>
+        <q-toolbar-title> Storage Box </q-toolbar-title>
         <q-space />
         <q-btn @click="logout">logout</q-btn>
       </q-toolbar>
     </q-header>
-
-    <q-drawer show-if-above v-model="drawerToggle" side="left" bordered>
-    </q-drawer>
 
     <q-page-container>
       <router-view></router-view>
@@ -25,15 +22,12 @@
 </template>
 
 <script lang="ts">
-import { ref, defineComponent } from "vue";
+import { defineComponent } from "vue";
 import logout from "@/utils/action/logout";
 
 export default defineComponent({
   setup() {
-    const drawerToggle = ref<boolean>(false);
-
     return {
-      drawerToggle,
       logout,
     };
   },

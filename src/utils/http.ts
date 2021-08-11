@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
-import logout from "./action/logout";
+import { useStore } from "@/store";
 import apiToken from "./token/apiToken";
 
 const http: AxiosInstance = axios.create();
@@ -26,11 +26,11 @@ http.interceptors.response.use(
     return res;
   },
   (err: AxiosError) :Promise<never> => {
-    if (err.response?.status == 401) {
-      logout();
-    }
-    if(err.response?.status == 403){
-      logout();
+    const statusCode = err.response?.status;
+    if (statusCode == 401 || statusCode == 403) {
+      const { auth } = useStore();
+      auth.removeUser();
+      apiToken.remove();
     }
     return Promise.reject(err);
   }

@@ -1,42 +1,43 @@
 <template>
   <drop-uploader @upload="upload" class="full-width">
-    <div class="row justify-center">
-      <div class="col-10" style="height: 500px">
-        <q-table
-          title="Treats"
-          :rows="fileInfos"
-          :columns="columns"
-          row-key="name"
-          selection="multiple"
-          v-model:selected="selected"
-          class="full-height scroll"
-        >
-          <template v-slot:top>
-            <!-- 工具列 -->
-            <tool-bar
-              class="q-mb-md"
-              :selected="selected"
-              :progressGroups="progressSideBar.groups"
-              @remove="rm"
-              @mkdir="mkdir"
-              @rename="rename"
-              @upload="upload"
-              @download="download"
-              @openDestChooserMove="openDestChooserMove"
-              @openDestChooserCopy="openDestChooserCopy"
-              @openProgressSideBar="openProgressSideBar"
-            />
-            <!-- 麵包屑導航 -->
-            <breadcrumbs-path-link
-              :nodes="pwdBreadcrumbNodes"
-              @changeDir="cd"
-            />
-          </template>
-          <template v-slot:body="props">
-            <row-data @changeDir="cd" :properties="props" :pwdStr="pwdStr" />
-          </template>
-        </q-table>
-      </div>
+    <div style="height: 500px">
+      <q-table
+        title="Treats"
+        :rows="fileInfos"
+        :columns="columns"
+        row-key="name"
+        selection="multiple"
+        v-model:selected="selected"
+        class="full-height scroll"
+        :loading="loading"
+      >
+        <template v-slot:top>
+          <!-- 工具列 -->
+          <tool-bar
+            class="q-mb-md"
+            :selected="selected"
+            :progressGroups="progressSideBar.groups"
+            @remove="rm"
+            @mkdir="mkdir"
+            @rename="rename"
+            @upload="upload"
+            @download="download"
+            @openDestChooserMove="openDestChooserMove"
+            @openDestChooserCopy="openDestChooserCopy"
+            @openProgressSideBar="openProgressSideBar"
+          />
+          <!-- 麵包屑導航 -->
+          <breadcrumbs-path-link :nodes="pwdBreadcrumbNodes" @changeDir="cd" />
+        </template>
+        <template v-slot:body="props">
+          <row-data @changeDir="cd" :properties="props" :pwdStr="pwdStr" />
+        </template>
+        <template v-slot:loading>
+          <q-inner-loading showing>
+            <q-spinner-ios size="50px" color="primary" />
+          </q-inner-loading>
+        </template>
+      </q-table>
     </div>
   </drop-uploader>
   <q-drawer
@@ -76,6 +77,7 @@ import { columns } from "./config/widget";
 import useFileInfos from "./composition/fileInfos";
 import useSelected from "./composition/selected";
 import usePwd from "./composition/pwd";
+import useLoading from "./composition/loading";
 
 import BreadcrumbsPathLink from "./components/BreadcrumbsPathLink.vue";
 
@@ -100,6 +102,7 @@ import ExistRecord from "./type/ProgressRecord/CopyMove/ExistRecord";
 import UploadRecord from "./type/ProgressRecord/Upload/UploadRecord";
 
 import getUploadRecords from "./utils/getUploadRecords";
+import { useQuasar } from "quasar";
 
 type DestChooserHandle = (toDir: string) => Promise<void>;
 
@@ -130,6 +133,7 @@ export default defineComponent({
   },
   setup(props) {
     const api = props.api as Api;
+
     const {
       fileInfos,
       setFileInfos,
@@ -138,8 +142,11 @@ export default defineComponent({
       getFileInfos,
       replaceFileInfo,
     } = useFileInfos();
+
     const { selected, clearSelected } = useSelected();
     const { pwdStr, pwdBreadcrumbNodes, setPwdByPath } = usePwd();
+    const { loading, loadingFunc } = useLoading();
+    const $q = useQuasar();
 
     const destChooserProps: DestChooserProps = {
       toggle: false,
@@ -158,7 +165,7 @@ export default defineComponent({
       list(pwdStr.value);
     });
 
-    const list = async (dir: string): Promise<void> => {
+    const list = loadingFunc(async (dir: string): Promise<void> => {
       try {
         const res = await api.list({
           dir,
@@ -169,7 +176,7 @@ export default defineComponent({
       } catch (err) {
         console.error(err);
       }
-    };
+    });
 
     const cd = async (dir: string): Promise<void> => {
       try {
@@ -181,7 +188,7 @@ export default defineComponent({
       }
     };
 
-    const rm = async (): Promise<void> => {
+    const rm = loadingFunc(async (): Promise<void> => {
       try {
         const res = await api.remove({
           dir: pwdStr.value,
@@ -195,9 +202,9 @@ export default defineComponent({
       } catch (err) {
         console.error(err);
       }
-    };
+    });
 
-    const mkdir = async (filename: string): Promise<void> => {
+    const mkdir = loadingFunc(async (filename: string): Promise<void> => {
       try {
         const res = await api.mkdir({
           dir: pwdStr.value,
@@ -207,17 +214,25 @@ export default defineComponent({
 
         if (fileInfo) {
           addFileInfos([fileInfo]);
-        } else if (!isSuccess) {
-          console.log("創建失敗");
         } else if (exist) {
-          console.log("檔案已存在: ", exist);
+          $q.notify({
+            message: "該位置已有同名檔案",
+            icon: "warning_amber",
+            position: "top-right",
+          });
+        } else if (!isSuccess) {
+          $q.notify({
+            message: "資料夾創建失敗",
+            icon: "warning_amber",
+            position: "top-right",
+          });
         }
       } catch (err) {
         console.error(err);
       }
-    };
+    });
 
-    const rename = async (newFileName: string): Promise<void> => {
+    const rename = loadingFunc(async (newFileName: string): Promise<void> => {
       try {
         const oldFileName = selected.value[0].name;
         const res = await api.rename({
@@ -226,17 +241,29 @@ export default defineComponent({
           newFileName,
         });
 
-        const { fileInfo } = res.data;
+        const { fileInfo, isSuccess, exist } = res.data;
         if (fileInfo) {
           replaceFileInfo(oldFileName, fileInfo);
+          clearSelected();
+        } else if (exist) {
+          $q.notify({
+            message: "該位置已有同名檔案",
+            icon: "warning_amber",
+            position: "top-right",
+          });
+        } else if (isSuccess) {
+          $q.notify({
+            message: "重新命名失敗",
+            icon: "warning_amber",
+            position: "top-right",
+          });
         }
-        clearSelected();
       } catch (err) {
         console.error(err);
       }
-    };
+    });
 
-    const download = async (): Promise<void> => {
+    const download = loadingFunc(async (): Promise<void> => {
       try {
         const res = await api.download({
           dir: pwdStr.value,
@@ -260,87 +287,91 @@ export default defineComponent({
       } catch (err) {
         console.error(err);
       }
-    };
+    });
 
-    const upload = async (
-      filePaths: string[],
-      files: File[]
-    ): Promise<void> => {
-      try {
-        const dir = pwdStr.value;
-        const res = await api.upload({
-          dir,
-          filePaths,
-          files,
-          options: optionConfig.OVERRIDE_NONE,
-        });
-        const { fileInfos, exists } = res.data;
-
-        addFileInfos(fileInfos);
-
-        if (exists.length > 0) {
-          const records = getUploadRecords(exists, dir, filePaths, files);
-          const group = new UploadRecordGroup(
-            "upload",
-            records,
-            uploadKeepBothReplace(true),
-            uploadKeepBothReplace(false)
-          );
-          progressSideBar.groups.unshift(group);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    const uploadKeepBothReplace =
-      (isKeepBoth: boolean): UploadFunc =>
-      async (
-        group: UploadRecordGroup,
-        record: UploadRecord,
-        dir: string,
-        filePaths: string[],
-        files: File[]
-      ) => {
+    const upload = loadingFunc(
+      async (filePaths: string[], files: File[]): Promise<void> => {
         try {
+          const dir = pwdStr.value;
           const res = await api.upload({
             dir,
             filePaths,
             files,
-            options: isKeepBoth
-              ? optionConfig.OVERRIDE_KEEPBOTH
-              : optionConfig.OVERRIDE_REPLACE,
+            options: optionConfig.OVERRIDE_NONE,
           });
-          const { fileInfos } = res.data;
+          const { fileInfos, exists } = res.data;
 
-          if (pwdStr.value === dir) {
-            //replace
-            if (!isKeepBoth) {
-              removeFileInfos(fileInfos.map((info) => info.name));
-            }
-            //keepBoth & replace
-            addFileInfos(fileInfos);
-          }
+          addFileInfos(fileInfos);
 
-          group.records = group.records.filter((r) => r !== record);
-          const { records } = group;
-          //record count is 0
-          if (records.length === 0) {
-            //remove group
-            progressSideBar.groups = progressSideBar.groups.filter(
-              (g) => g !== group
+          if (exists.length > 0) {
+            const records = getUploadRecords(exists, dir, filePaths, files);
+            const group = new UploadRecordGroup(
+              "upload",
+              records,
+              uploadKeepBothReplace(true),
+              uploadKeepBothReplace(false)
             );
+            progressSideBar.groups.unshift(group);
           }
         } catch (err) {
           console.error(err);
         }
-      };
+      }
+    );
 
-    const copyMove =
-      (isCopy: boolean) =>
-      async (toDir: string): Promise<void> => {
+    const uploadKeepBothReplace = (isKeepBoth: boolean): UploadFunc =>
+      loadingFunc(
+        async (
+          group: UploadRecordGroup,
+          record: UploadRecord,
+          dir: string,
+          filePaths: string[],
+          files: File[]
+        ) => {
+          try {
+            const res = await api.upload({
+              dir,
+              filePaths,
+              files,
+              options: isKeepBoth
+                ? optionConfig.OVERRIDE_KEEPBOTH
+                : optionConfig.OVERRIDE_REPLACE,
+            });
+            const { fileInfos } = res.data;
+
+            if (pwdStr.value === dir) {
+              //replace
+              if (!isKeepBoth) {
+                removeFileInfos(fileInfos.map((info) => info.name));
+              }
+              //keepBoth & replace
+              addFileInfos(fileInfos);
+            }
+
+            group.records = group.records.filter((r) => r !== record);
+            const { records } = group;
+            //record count is 0
+            if (records.length === 0) {
+              //remove group
+              progressSideBar.groups = progressSideBar.groups.filter(
+                (g) => g !== group
+              );
+            }
+          } catch (err) {
+            console.error(err);
+          }
+        }
+      );
+
+    const copyMove = (isCopy: boolean) =>
+      loadingFunc(async (toDir: string): Promise<void> => {
         try {
           const fromDir = pwdStr.value;
+
+          if (fromDir === toDir && !isCopy) {
+            return;
+          }
+
           const payload = {
             fromDir,
             toDir,
@@ -350,10 +381,6 @@ export default defineComponent({
           const res = await (isCopy ? api.copy(payload) : api.move(payload));
 
           const { fileInfos, exists, selfs } = res.data;
-
-          if (fromDir === toDir && isCopy) {
-            addFileInfos(fileInfos);
-          }
 
           if (fromDir !== toDir && !isCopy) {
             removeFileInfos(fileInfos.map((info) => info.name));
@@ -390,56 +417,60 @@ export default defineComponent({
         } catch (err) {
           console.error(err);
         }
-      };
+      });
 
-    const copyMoveKeepBothReplace =
-      (isCopy: boolean, isKeepBoth: boolean): CopyMoveFunc =>
-      async (
-        group: CopyMoveRecordGroup,
-        record: ExistRecord | SelfRecord,
-        fromDir: string,
-        toDir: string,
-        filename: string
-      ) => {
-        try {
-          const payload = {
-            fromDir,
-            toDir,
-            filenames: [filename],
-            options: isKeepBoth
-              ? optionConfig.OVERRIDE_KEEPBOTH
-              : optionConfig.OVERRIDE_REPLACE,
-          };
-          const res = await (isCopy ? api.copy(payload) : api.move(payload));
+    const copyMoveKeepBothReplace = (
+      isCopy: boolean,
+      isKeepBoth: boolean
+    ): CopyMoveFunc =>
+      loadingFunc(
+        async (
+          group: CopyMoveRecordGroup,
+          record: ExistRecord | SelfRecord,
+          fromDir: string,
+          toDir: string,
+          filename: string
+        ) => {
+          try {
+            const payload = {
+              fromDir,
+              toDir,
+              filenames: [filename],
+              options: isKeepBoth
+                ? optionConfig.OVERRIDE_KEEPBOTH
+                : optionConfig.OVERRIDE_REPLACE,
+            };
+            const res = await (isCopy ? api.copy(payload) : api.move(payload));
 
-          const { fileInfos, notExists } = res.data;
+            const { fileInfos, notExists } = res.data;
 
-          if (notExists.length > 0) {
-            console.log(notExists[0], "不存在");
-          }
-
-          if (pwdStr.value === toDir) {
-            //replace
-            if (!isKeepBoth) {
-              removeFileInfos(fileInfos.map((info) => info.name));
+            if (notExists.length > 0) {
+              console.log(notExists[0], "不存在");
             }
-            //keepBoth & replace
-            addFileInfos(fileInfos);
-          }
 
-          group.existRecords = group.existRecords.filter((r) => r !== record);
-          const { existRecords, selfRecords } = group;
-          //record count is 0
-          if (existRecords.length + selfRecords.length === 0) {
-            //remove group
-            progressSideBar.groups = progressSideBar.groups.filter(
-              (g) => g !== group
-            );
+            if (pwdStr.value === toDir) {
+              //replace
+              if (!isKeepBoth) {
+                removeFileInfos(fileInfos.map((info) => info.name));
+              }
+              //keepBoth & replace
+              addFileInfos(fileInfos);
+            }
+
+            group.existRecords = group.existRecords.filter((r) => r !== record);
+            const { existRecords, selfRecords } = group;
+            //record count is 0
+            if (existRecords.length + selfRecords.length === 0) {
+              //remove group
+              progressSideBar.groups = progressSideBar.groups.filter(
+                (g) => g !== group
+              );
+            }
+          } catch (err) {
+            console.error(err);
           }
-        } catch (err) {
-          console.error(err);
         }
-      };
+      );
 
     const move: DestChooserHandle = copyMove(false);
     const copy: DestChooserHandle = copyMove(true);
@@ -491,6 +522,7 @@ export default defineComponent({
       openDestChooserCopy,
       openProgressSideBar,
       removeGroup,
+      loading,
     };
   },
 });

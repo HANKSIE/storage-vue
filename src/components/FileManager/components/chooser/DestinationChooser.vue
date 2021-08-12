@@ -51,7 +51,7 @@
       <q-item-section>
         <div class="row items-center">
           <div class="col-6">
-            <q-btn @click="mkdir">New Folder</q-btn>
+            <q-btn @click="mkdir" outline>New Folder</q-btn>
           </div>
         </div>
       </q-item-section>
@@ -67,12 +67,16 @@
       </q-item-section>
     </q-item>
   </q-list>
+  <q-inner-loading :showing="loading">
+    <q-spinner-ball size="50px" color="primary" />
+  </q-inner-loading>
 </template>
 <script lang="ts">
 import { defineComponent, PropType, ref, watchEffect } from "vue";
 import usePwd from "../../composition/pwd";
-
+import useLoading from "../../composition/loading";
 import useFileInfos from "../../composition/fileInfos";
+
 import optionConfig from "../../config/options";
 import getMimeIcon from "../../utils/getMimeIcon";
 
@@ -84,6 +88,7 @@ import Api from "../../type/api";
 
 import filenameRule from "../../validate/rules/filename";
 import validate from "../../validate/validate";
+import { useQuasar } from "quasar";
 
 export default defineComponent({
   components: { LinkText, BreadcrumbsPathLink },
@@ -105,10 +110,15 @@ export default defineComponent({
     const api = props.api as Api;
 
     const dirname = ref<string>("");
-    const { pwdStr, pwdBreadcrumbNodes, setPwdByPath } = usePwd();
-    const { fileInfos, setFileInfos, addFileInfos } = useFileInfos();
 
-    const mkdir = async (): Promise<void> => {
+    const $q = useQuasar();
+
+    const { pwdStr, pwdBreadcrumbNodes, setPwdByPath } = usePwd();
+    const { fileInfos, setFileInfos, addFileInfos, clearFileInfos } =
+      useFileInfos();
+    const { loading, loadingFunc } = useLoading();
+
+    const mkdir = loadingFunc(async (): Promise<void> => {
       if (!validate(filenameRule(dirname.value))) {
         return;
       }
@@ -118,25 +128,34 @@ export default defineComponent({
           dir: pwdStr.value,
           filename: dirname.value,
         });
+
         const { fileInfo, isSuccess, exist } = res.data;
 
         if (fileInfo) {
           addFileInfos([fileInfo]);
           emit("mkdirHook", pwdStr.value, fileInfo);
           dirname.value = "";
-        } else if (!isSuccess) {
-          console.log("創建失敗");
         } else if (exist) {
-          console.log("檔案已存在: ", exist);
+          $q.notify({
+            message: "該位置已有同名檔案",
+            icon: "warning_amber",
+            position: "top-right",
+          });
+        } else if (!isSuccess) {
+          $q.notify({
+            message: "資料夾創建失敗",
+            icon: "warning_amber",
+            position: "top-right",
+          });
         }
       } catch (err) {
         console.error(err);
       }
-    };
+    });
 
-    const handle = () => emit("handle", pwdStr.value);
+    const handle = loadingFunc(() => emit("handle", pwdStr.value));
 
-    const list = async (dir: string): Promise<void> => {
+    const list = loadingFunc(async (dir: string): Promise<void> => {
       try {
         const res = await api.list({
           dir,
@@ -147,7 +166,7 @@ export default defineComponent({
       } catch (err) {
         console.error(err);
       }
-    };
+    });
 
     const cd = async (dir: string): Promise<void> => {
       try {
@@ -166,9 +185,10 @@ export default defineComponent({
     watchEffect(() => {
       if (!props.toggle) {
         setPwdByPath("");
-        list(pwdStr.value);
+        clearFileInfos();
+        dirname.value = "";
       } else {
-        list(pwdStr.value);
+        list("");
       }
     });
 
@@ -182,6 +202,7 @@ export default defineComponent({
       handle,
       getMimeIcon,
       filenameRule,
+      loading,
     };
   },
 });

@@ -1,6 +1,8 @@
 <template>
-  <div class="row q-pa-md full-width">
-    <file-manager :api="fileManagerApi" />
+  <div class="row q-pa-md full-width justify-center">
+    <div class="col-6">
+      <file-manager :api="fileManagerApi" />
+    </div>
   </div>
 </template>
 <script lang="ts">

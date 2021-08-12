@@ -119,7 +119,7 @@ export default defineComponent({
     const { loading, loadingFunc } = useLoading();
 
     const mkdir = loadingFunc(async (): Promise<void> => {
-      if (!validate(filenameRule(dirname.value))) {
+      if (!validate(filenameRule(dirname.value)) || !dirname.value) {
         return;
       }
 

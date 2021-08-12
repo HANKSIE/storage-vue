@@ -1,11 +1,11 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
+import Home from "@/views/Home.vue";
 import Login from "@/views/Login.vue";
 import Register from "@/views/Register.vue";
 import PageNotFound from "@/views/PageNotFound.vue";
 import DashboardTemplate from "@/layout/Dashboard.vue";
 import NormalTemplate from "@/layout/Normal.vue";
 import FileManager from "@/views/Dashboard/FileManager.vue";
-import Setting from "@/views/Dashboard/Setting.vue";
 
 import authApi from "@/utils/api/auth";
 import apiToken from "@/utils/token/apiToken";
@@ -22,17 +22,17 @@ const routes: RouteRecordRaw[] = [
         name: "user_file",
         component: FileManager,
       },
-      {
-        path: "setting",
-        name: "user_setting",
-        component: Setting
-      },
     ]
   },
   {
     path: "/",
     component: NormalTemplate,
     children: [
+      {
+        path: "",
+        name: "home",
+        component: Home,
+      },
       {
         path: "login",
         name: "login",

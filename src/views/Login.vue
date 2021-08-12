@@ -9,7 +9,7 @@
           <alert-list :messages="errorMessages" />
         </q-card-section>
         <q-card-section>
-          <q-input filled v-model="email" label="Email">
+          <q-input filled v-model="email" label="Email" type="email">
             <template v-slot:prepend>
               <q-icon name="email" />
             </template>

@@ -1,48 +1,43 @@
 <template>
   <drop-uploader @upload="upload" class="full-width">
-    <div class="row justify-center">
-      <div class="col-10" style="height: 500px">
-        <q-table
-          title="Treats"
-          :rows="fileInfos"
-          :columns="columns"
-          row-key="name"
-          selection="multiple"
-          v-model:selected="selected"
-          class="full-height scroll"
-          :loading="loading"
-        >
-          <template v-slot:top>
-            <!-- 工具列 -->
-            <tool-bar
-              class="q-mb-md"
-              :selected="selected"
-              :progressGroups="progressSideBar.groups"
-              @remove="rm"
-              @mkdir="mkdir"
-              @rename="rename"
-              @upload="upload"
-              @download="download"
-              @openDestChooserMove="openDestChooserMove"
-              @openDestChooserCopy="openDestChooserCopy"
-              @openProgressSideBar="openProgressSideBar"
-            />
-            <!-- 麵包屑導航 -->
-            <breadcrumbs-path-link
-              :nodes="pwdBreadcrumbNodes"
-              @changeDir="cd"
-            />
-          </template>
-          <template v-slot:body="props">
-            <row-data @changeDir="cd" :properties="props" :pwdStr="pwdStr" />
-          </template>
-          <template v-slot:loading>
-            <q-inner-loading showing>
-              <q-spinner-ios size="50px" color="primary" />
-            </q-inner-loading>
-          </template>
-        </q-table>
-      </div>
+    <div style="height: 500px">
+      <q-table
+        title="Treats"
+        :rows="fileInfos"
+        :columns="columns"
+        row-key="name"
+        selection="multiple"
+        v-model:selected="selected"
+        class="full-height scroll"
+        :loading="loading"
+      >
+        <template v-slot:top>
+          <!-- 工具列 -->
+          <tool-bar
+            class="q-mb-md"
+            :selected="selected"
+            :progressGroups="progressSideBar.groups"
+            @remove="rm"
+            @mkdir="mkdir"
+            @rename="rename"
+            @upload="upload"
+            @download="download"
+            @openDestChooserMove="openDestChooserMove"
+            @openDestChooserCopy="openDestChooserCopy"
+            @openProgressSideBar="openProgressSideBar"
+          />
+          <!-- 麵包屑導航 -->
+          <breadcrumbs-path-link :nodes="pwdBreadcrumbNodes" @changeDir="cd" />
+        </template>
+        <template v-slot:body="props">
+          <row-data @changeDir="cd" :properties="props" :pwdStr="pwdStr" />
+        </template>
+        <template v-slot:loading>
+          <q-inner-loading showing>
+            <q-spinner-ios size="50px" color="primary" />
+          </q-inner-loading>
+        </template>
+      </q-table>
     </div>
   </drop-uploader>
   <q-drawer

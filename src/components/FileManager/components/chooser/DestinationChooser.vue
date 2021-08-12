@@ -68,7 +68,7 @@
     </q-item>
   </q-list>
   <q-inner-loading :showing="loading">
-    <q-spinner-ios size="50px" color="primary" />
+    <q-spinner-ball size="50px" color="primary" />
   </q-inner-loading>
 </template>
 <script lang="ts">

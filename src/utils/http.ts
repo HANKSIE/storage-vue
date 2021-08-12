@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
-import { useStore } from "@/store";
 import apiToken from "./token/apiToken";
+import clearAuthAndRedirectToLogin from "./action/clearAuthAndRedirectToLogin";
 
 const http: AxiosInstance = axios.create();
 
@@ -27,10 +27,8 @@ http.interceptors.response.use(
   },
   (err: AxiosError) :Promise<never> => {
     const statusCode = err.response?.status;
-    if (statusCode == 401 || statusCode == 403) {
-      const { auth } = useStore();
-      auth.removeUser();
-      apiToken.remove();
+    if (statusCode == 401) {
+      clearAuthAndRedirectToLogin();
     }
     return Promise.reject(err);
   }

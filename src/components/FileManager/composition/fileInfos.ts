@@ -20,6 +20,7 @@ const useFileInfos = () => {
         const pos = fileInfos.value.findIndex((info) => info.name === name);
         fileInfos.value.splice(pos, 1, info);
     }
+    const clearFileInfos = () => fileInfos.value = []
 
     return {
         fileInfos,
@@ -27,7 +28,8 @@ const useFileInfos = () => {
         getFileInfos,
         removeFileInfos,
         addFileInfos,
-        replaceFileInfo
+        replaceFileInfo,
+        clearFileInfos
     };
 }
 

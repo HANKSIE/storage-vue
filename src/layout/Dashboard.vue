@@ -11,7 +11,7 @@
         />
         <q-toolbar-title> Storage Box </q-toolbar-title>
         <q-space />
-        <q-chip class="q-mx-md" dark="false" icon="person">
+        <q-chip class="q-mx-md" :dark="false" icon="person">
           <span class="ellipsis" style="max-width: 150px">{{ user.name }}</span>
         </q-chip>
         <q-btn @click="logout" icon="logout" flat />

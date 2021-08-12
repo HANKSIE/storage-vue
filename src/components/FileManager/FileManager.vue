@@ -341,6 +341,11 @@ export default defineComponent({
       async (toDir: string): Promise<void> => {
         try {
           const fromDir = pwdStr.value;
+
+          if (fromDir === toDir && !isCopy) {
+            return;
+          }
+
           const payload = {
             fromDir,
             toDir,
@@ -350,10 +355,6 @@ export default defineComponent({
           const res = await (isCopy ? api.copy(payload) : api.move(payload));
 
           const { fileInfos, exists, selfs } = res.data;
-
-          if (fromDir === toDir && isCopy) {
-            addFileInfos(fileInfos);
-          }
 
           if (fromDir !== toDir && !isCopy) {
             removeFileInfos(fileInfos.map((info) => info.name));

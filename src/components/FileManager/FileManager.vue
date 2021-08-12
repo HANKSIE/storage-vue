@@ -102,6 +102,7 @@ import ExistRecord from "./type/ProgressRecord/CopyMove/ExistRecord";
 import UploadRecord from "./type/ProgressRecord/Upload/UploadRecord";
 
 import getUploadRecords from "./utils/getUploadRecords";
+import { useQuasar } from "quasar";
 
 type DestChooserHandle = (toDir: string) => Promise<void>;
 
@@ -132,6 +133,7 @@ export default defineComponent({
   },
   setup(props) {
     const api = props.api as Api;
+
     const {
       fileInfos,
       setFileInfos,
@@ -140,10 +142,11 @@ export default defineComponent({
       getFileInfos,
       replaceFileInfo,
     } = useFileInfos();
+
     const { selected, clearSelected } = useSelected();
     const { pwdStr, pwdBreadcrumbNodes, setPwdByPath } = usePwd();
-
     const { loading, loadingFunc } = useLoading();
+    const $q = useQuasar();
 
     const destChooserProps: DestChooserProps = {
       toggle: false,
@@ -211,10 +214,18 @@ export default defineComponent({
 
         if (fileInfo) {
           addFileInfos([fileInfo]);
-        } else if (!isSuccess) {
-          console.log("創建失敗");
         } else if (exist) {
-          console.log("檔案已存在: ", exist);
+          $q.notify({
+            message: "該位置已有同名檔案",
+            icon: "warning_amber",
+            position: "top-right",
+          });
+        } else if (!isSuccess) {
+          $q.notify({
+            message: "資料夾創建失敗",
+            icon: "warning_amber",
+            position: "top-right",
+          });
         }
       } catch (err) {
         console.error(err);
@@ -230,11 +241,23 @@ export default defineComponent({
           newFileName,
         });
 
-        const { fileInfo } = res.data;
+        const { fileInfo, isSuccess, exist } = res.data;
         if (fileInfo) {
           replaceFileInfo(oldFileName, fileInfo);
+          clearSelected();
+        } else if (exist) {
+          $q.notify({
+            message: "該位置已有同名檔案",
+            icon: "warning_amber",
+            position: "top-right",
+          });
+        } else if (isSuccess) {
+          $q.notify({
+            message: "重新命名失敗",
+            icon: "warning_amber",
+            position: "top-right",
+          });
         }
-        clearSelected();
       } catch (err) {
         console.error(err);
       }

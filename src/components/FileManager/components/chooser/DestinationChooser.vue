@@ -88,6 +88,7 @@ import Api from "../../type/api";
 
 import filenameRule from "../../validate/rules/filename";
 import validate from "../../validate/validate";
+import { useQuasar } from "quasar";
 
 export default defineComponent({
   components: { LinkText, BreadcrumbsPathLink },
@@ -110,6 +111,8 @@ export default defineComponent({
 
     const dirname = ref<string>("");
 
+    const $q = useQuasar();
+
     const { pwdStr, pwdBreadcrumbNodes, setPwdByPath } = usePwd();
     const { fileInfos, setFileInfos, addFileInfos, clearFileInfos } =
       useFileInfos();
@@ -125,16 +128,25 @@ export default defineComponent({
           dir: pwdStr.value,
           filename: dirname.value,
         });
+
         const { fileInfo, isSuccess, exist } = res.data;
 
         if (fileInfo) {
           addFileInfos([fileInfo]);
           emit("mkdirHook", pwdStr.value, fileInfo);
           dirname.value = "";
-        } else if (!isSuccess) {
-          console.log("創建失敗");
         } else if (exist) {
-          console.log("檔案已存在: ", exist);
+          $q.notify({
+            message: "該位置已有同名檔案",
+            icon: "warning_amber",
+            position: "top-right",
+          });
+        } else if (!isSuccess) {
+          $q.notify({
+            message: "資料夾創建失敗",
+            icon: "warning_amber",
+            position: "top-right",
+          });
         }
       } catch (err) {
         console.error(err);
@@ -174,6 +186,7 @@ export default defineComponent({
       if (!props.toggle) {
         setPwdByPath("");
         clearFileInfos();
+        dirname.value = "";
       } else {
         list("");
       }

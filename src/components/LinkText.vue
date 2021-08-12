@@ -28,8 +28,7 @@ export default defineComponent({
 });
 </script>
 <style scoped>
-.link-text:hover {
-  transition-duration: 0.3s;
+.link-text {
   text-decoration: underline;
   cursor: pointer;
 }

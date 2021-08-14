@@ -29,7 +29,9 @@
     </div>
     <div class="q-mt-md row justify-between">
       <q-btn @click="keepBoth(group, record)" outline>Keep Both</q-btn>
-      <q-btn @click="replace(group, record)" outline>Replace</q-btn>
+      <template v-if="record.fromDir !== record.toDir">
+        <q-btn @click="replace(group, record)" outline>Replace</q-btn>
+      </template>
     </div>
   </div>
 

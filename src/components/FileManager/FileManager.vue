@@ -10,6 +10,7 @@
         v-model:selected="selected"
         class="full-height scroll"
         :loading="loading"
+        :rows-per-page-options="[0]"
       >
         <template v-slot:top>
           <!-- 工具列 -->
@@ -72,6 +73,7 @@ import {
   onMounted,
   PropType,
   reactive,
+  watchEffect,
 } from "@vue/runtime-core";
 import { columns } from "./config/widget";
 import useFileInfos from "./composition/fileInfos";
@@ -365,10 +367,16 @@ export default defineComponent({
 
     const copyMove = (isCopy: boolean) =>
       loadingFunc(async (toDir: string): Promise<void> => {
+        destChooser.toggle = false;
         try {
           const fromDir = pwdStr.value;
 
           if (fromDir === toDir && !isCopy) {
+            $q.notify({
+              message: "該目錄已有這些檔案",
+              icon: "warning_amber",
+              position: "top-right",
+            });
             return;
           }
 
@@ -413,7 +421,6 @@ export default defineComponent({
             progressSideBar.groups.unshift(group);
           }
           clearSelected();
-          destChooser.toggle = false;
         } catch (err) {
           console.error(err);
         }
@@ -502,6 +509,12 @@ export default defineComponent({
         (g) => g !== group
       );
     };
+
+    watchEffect(() => {
+      if (progressSideBar.groups.length === 0) {
+        progressSideBar.toggle = false;
+      }
+    });
 
     return {
       columns,

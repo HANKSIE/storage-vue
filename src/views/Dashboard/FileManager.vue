@@ -1,6 +1,6 @@
 <template>
   <div class="row q-pa-md full-width justify-center">
-    <div class="col-6">
+    <div class="col-7">
       <file-manager :api="fileManagerApi" />
     </div>
   </div>

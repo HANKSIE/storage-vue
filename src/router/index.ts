@@ -56,6 +56,8 @@ const router = createRouter({
   routes,
 });
 
+const redirectPageNames = ["login", "register", "home"];
+
 router.beforeEach(async (to, from, next) => {
 
   const requireAuth = to.matched[0].meta.requireAuth;
@@ -73,7 +75,7 @@ router.beforeEach(async (to, from, next) => {
     }
   }
 
-  if ((to.name == "login" || to.name === "register") && auth.state.user) {
+  if ((redirectPageNames.includes(to.name as string)) && auth.state.user) {
     //有權限卻進入登入/註冊頁面
     return next({ name: "user_file" });
   }

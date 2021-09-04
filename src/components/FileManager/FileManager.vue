@@ -1,6 +1,6 @@
 <template>
   <drop-uploader @upload="upload" class="full-width">
-    <div style="height: 500px">
+    <div style="height: 80vh">
       <q-table
         title="Treats"
         :rows="fileInfos"
@@ -540,6 +540,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style>
-</style>

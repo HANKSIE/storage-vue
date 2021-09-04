@@ -38,7 +38,7 @@ export default defineComponent({
 
       const filePaths = files.map((f) => {
         return f.webkitRelativePath.length === 0
-          ? f.name
+          ? `/${f.name}`
           : f.webkitRelativePath;
       });
       emit("upload", filePaths, files);

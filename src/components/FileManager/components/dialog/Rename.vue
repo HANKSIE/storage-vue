@@ -10,7 +10,7 @@
             filled
             v-model="filename"
             label="檔案名稱"
-            :rules="[filenameRule]"
+            :rules="[filenameRule, notAllowEmptyRule]"
           >
             <template v-slot:prepend>
               <q-icon name="drive_file_rename_outline" />
@@ -32,6 +32,7 @@
 import { useDialogPluginComponent } from "quasar";
 import { defineComponent, ref } from "vue";
 import filenameRule from "../../validate/rules/filename";
+import notAllowEmptyRule from "../../validate/rules/notAllowEmpty";
 import validate from "../../validate/validate";
 
 export default defineComponent({
@@ -47,7 +48,7 @@ export default defineComponent({
 
     const onOKClick = (): void => {
       const name = filename.value;
-      if (validate(filenameRule(name))) {
+      if (validate(filenameRule(name), notAllowEmptyRule(name))) {
         const extension = props.ext ? "." + props.ext : "";
         onDialogOK(`${filename.value}${extension}`);
         filename.value = "";
@@ -61,6 +62,7 @@ export default defineComponent({
       onOKClick,
       onCancelClick: onDialogCancel,
       filenameRule,
+      notAllowEmptyRule,
     };
   },
 });

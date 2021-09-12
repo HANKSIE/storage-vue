@@ -39,7 +39,7 @@
           label="資料夾名稱"
           outlined
           v-model="dirname"
-          :rules="[filenameRule]"
+          :rules="[filenameRule, notAllowEmptyRule]"
         >
           <template v-slot:prepend>
             <q-icon name="create_new_folder" />
@@ -89,6 +89,7 @@ import Api from "../../type/api";
 import filenameRule from "../../validate/rules/filename";
 import validate from "../../validate/validate";
 import { useQuasar } from "quasar";
+import notAllowEmptyRule from "../../validate/rules/notAllowEmpty";
 
 export default defineComponent({
   components: { LinkText, BreadcrumbsPathLink },
@@ -119,7 +120,9 @@ export default defineComponent({
     const { loading, loadingFunc } = useLoading();
 
     const mkdir = loadingFunc(async (): Promise<void> => {
-      if (!validate(filenameRule(dirname.value)) || !dirname.value) {
+      if (
+        !validate(filenameRule(dirname.value), notAllowEmptyRule(dirname.value))
+      ) {
         return;
       }
 
@@ -202,6 +205,7 @@ export default defineComponent({
       handle,
       getMimeIcon,
       filenameRule,
+      notAllowEmptyRule,
       loading,
     };
   },

@@ -188,7 +188,7 @@ export default defineComponent({
         clearFileInfos();
         dirname.value = "";
       } else {
-        list("");
+        list("/");
       }
     });
 

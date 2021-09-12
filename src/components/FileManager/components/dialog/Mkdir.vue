@@ -9,7 +9,7 @@
           filled
           v-model="dirname"
           label="資料夾名稱"
-          :rules="[filenameRule]"
+          :rules="[filenameRule, notAllowEmptyRule]"
         >
           <template v-slot:prepend>
             <q-icon name="create_new_folder" />
@@ -28,6 +28,7 @@
 import { useDialogPluginComponent } from "quasar";
 import { defineComponent, ref } from "vue";
 import filenameRule from "../../validate/rules/filename";
+import notAllowEmptyRule from "../../validate/rules/notAllowEmpty";
 import validate from "../../validate/validate";
 
 export default defineComponent({
@@ -41,7 +42,7 @@ export default defineComponent({
     const onOKClick = (): void => {
       const dir = dirname.value;
 
-      if (validate(filenameRule(dir))) {
+      if (validate(filenameRule(dir), notAllowEmptyRule(dir))) {
         onDialogOK(dir);
         dirname.value = "";
       }
@@ -54,6 +55,7 @@ export default defineComponent({
       onOKClick,
       onCancelClick: onDialogCancel,
       filenameRule,
+      notAllowEmptyRule,
     };
   },
 });

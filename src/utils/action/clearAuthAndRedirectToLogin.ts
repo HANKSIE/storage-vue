@@ -1,6 +1,6 @@
 import { useStore } from "@/store";
 import router from "@/router";
-import apiToken from "@/utils/token/apiToken";
+import apiToken from "@/utils/localstorage/apiToken";
 
 const clearAuthAndRedirectToLogin = (): void => {
   const { auth } = useStore();

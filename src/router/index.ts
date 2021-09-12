@@ -56,7 +56,7 @@ const router = createRouter({
   routes,
 });
 
-const redirectPageNames = ["login", "register", "home"];
+const redirectPageNames = ["login", "register"];
 
 router.beforeEach(async (to, from, next) => {
 

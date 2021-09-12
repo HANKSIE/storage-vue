@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
-import apiToken from "./token/apiToken";
+import apiToken from "./localstorage/apiToken";
 import clearAuthAndRedirectToLogin from "./action/clearAuthAndRedirectToLogin";
 
 const http: AxiosInstance = axios.create();

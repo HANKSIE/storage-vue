@@ -47,7 +47,7 @@ import { defineComponent, ref } from "vue";
 import authApi from "@/utils/api/auth";
 import { useRouter } from "vue-router";
 import { useStore } from "@/store";
-import apiToken from "@/utils/token/apiToken";
+import apiToken from "@/utils/localstorage/apiToken";
 import LinkText from "@/components/LinkText.vue";
 import AlertList from "@/components/AlertList.vue";
 import useResponseErrorMessage from "@/composition/responseErrorMessage";

@@ -8,7 +8,7 @@ import NormalTemplate from "@/layout/Normal.vue";
 import FileManager from "@/views/Dashboard/FileManager.vue";
 
 import authApi from "@/utils/api/auth";
-import apiToken from "@/utils/token/apiToken";
+import apiToken from "@/utils/localstorage/apiToken";
 import { useStore } from "@/store";
 
 const routes: RouteRecordRaw[] = [
